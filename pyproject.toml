@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snippyts"
+version = "0.0.1"
+authors = [
+  { name="Jordi Carrera Ventura", email="jordi.carrera.ventura@gmail.com" },
+]
+description = ""
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = ""
+"Bug Tracker" = ""
+
+
+
+
