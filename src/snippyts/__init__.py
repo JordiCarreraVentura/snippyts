@@ -87,6 +87,74 @@ def flatten(lists: List[List[Any]]) -> List[Any]:
     return [e for l in lists for e in l]
 
 
+def to_txt(string: str, path: str) -> None:
+    """
+    Function that expects two string parameters as arguments and writes the
+    first string as the content of a file at the location denoted by the second
+    string (which is assumed to denote a POSIX path).
+
+    Parameters
+    ----------
+    string: str
+        Some text data to write to disk.
+
+    path: str
+        The location where the input text data must be stored, as a POSIX path.
+
+    Returns
+    -------
+    Nothing, writes the value stored in input variable `string` to the disk
+    location denoted by `path`.
+
+    Examples
+    --------
+    >>> import os
+    >>> test_path = "./test_path.txt"
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_txt("test raw text.", test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_txt(test_path) == "test raw text."
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'w') as wrt:
+        wrt.write(string)
+
+
+def from_txt(path: str) -> str:
+    """
+    Function that can be directed to a local raw text file by its POSIX path
+    and returns the content of that file as a string.
+
+    Parameters
+    ----------
+    path: str
+        The location where the input text data must be stored, as a POSIX path.
+
+    Returns
+    -------
+    str: the raw-text content read from the disk location denoted by the
+    argument of parameter `path`.
+
+    Examples
+    --------
+    >>> import os
+    >>> test_path = "./test_path.txt"
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_txt("test raw text.", test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_txt(test_path) == "test raw text."
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'r') as rd:
+        return rd.read().strip()
+
+
 
 if __name__ == '__main__':
     testmod()
