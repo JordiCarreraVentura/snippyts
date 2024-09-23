@@ -1,5 +1,8 @@
 # snippyts
 
+Miscellaneous utility scripts and Python objects for agile development.
+
+
 # Table of objects
 
 | No. | Name | Description | Date added | Date reviewed |
