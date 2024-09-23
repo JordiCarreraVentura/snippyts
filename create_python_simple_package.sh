@@ -97,8 +97,9 @@ fi ;
 
 echo "INFO: Creating folder structure...";
 
-echo "twine" > "requirements.txt" ;
 echo "INFO: Installing packaging tools..." ;
+echo "build" > "requirements.txt" ;
+echo "twine" >> "requirements.txt" ;
 python -m pip install --upgrade -r requirements.txt ;
 
 touch "LICENSE" ;
