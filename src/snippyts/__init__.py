@@ -1,3 +1,5 @@
+import json
+
 from doctest import testmod
 from itertools import chain
 from typing import Any, List
@@ -153,6 +155,46 @@ def from_txt(path: str) -> str:
     """
     with open(path, 'r') as rd:
         return rd.read().strip()
+
+
+def to_json(dict_: Any, path: str, indentation: int = 4) -> None:
+    """
+    Function that expects two parameters as arguments, a Python dictionary and
+    a string, and writes the former as the content of a file at the location
+    denoted by the latter (which is assumed to denote a POSIX path).
+
+    Parameters
+    ----------
+    dict_: Any
+        A Python dictionary (associative array) whose contents we want
+        serialized to disk. The contents must be JSON-dumpable, e.g. no keys
+        or values in the dictionary should contain binaries. Otherwise,
+        consider pickling the object with `to_pickle`.
+
+    path: str
+        The location where the input text data must be stored, as a POSIX path.
+
+    indentation: int
+        An integer denoting the indentation to use for every level of nested
+        dictionaries stored in input object `dict_`. A dictionary consisting
+        of a keys and values will be serialized with an indentation equal to
+        `indentation x 1` whitespace characters. If any of those values itself
+        contains another dictionary, the values of the latter will be
+        serialized with an indentation level equal to `indentation x 2`, and
+        so on.
+
+    Returns
+    -------
+    Nothing, writes the value stored in input variable `payload` to the disk
+    location denoted by `path`.
+
+    Examples
+    --------
+
+    """
+    with open(path, 'w') as wrt:
+      json.dump(dict_, wrt, indent=indentation)
+
 
 
 
