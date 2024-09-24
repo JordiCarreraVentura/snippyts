@@ -1,8 +1,8 @@
+from collections import OrderedDict
 import json
 
 from doctest import testmod
 from itertools import chain
-from typing import Any, List
 from typing import Any, Dict, List
 
 
@@ -172,6 +172,27 @@ def from_json(path: str) -> Dict[Any, Any]:
     -------
     str: the dictionary content read from the disk location denoted by the
     argument of parameter `path`.
+
+    Examples
+    --------
+    >>> import os
+    >>> path_json = "json_dump.json"
+    >>> assert not os.path.exists(path_json)
+
+    >>> data = {1: "one", 2: "two", 3: "three"}
+    >>> to_json(data, path_json)
+    >>> assert os.path.exists(path_json)
+
+    >>> keys = list(data.keys())
+    >>> for key in keys:
+    ...    del data[key]
+    >>> assert len(data) == 0
+
+    >>> data.update(from_json(path_json))
+    >>> assert len(data) == 3
+    >>> assert data == OrderedDict({"1": "one", "2": "two", "3": "three"})
+
+    >>> os.remove(path_json)
     """
     with open(path, 'r') as rd:
         data = json.load(rd, object_pairs_hook=OrderedDict)
@@ -211,7 +232,24 @@ def to_json(dict_: Dict[Any, Any], path: str, indentation: int = 4) -> None:
 
     Examples
     --------
+    >>> import os
+    >>> path_json = "json_dump.json"
+    >>> assert not os.path.exists(path_json)
 
+    >>> data = {1: "one", 2: "two", 3: "three"}
+    >>> to_json(data, path_json)
+    >>> assert os.path.exists(path_json)
+
+    >>> keys = list(data.keys())
+    >>> for key in keys:
+    ...    del data[key]
+    >>> assert len(data) == 0
+
+    >>> data.update(from_json(path_json))
+    >>> assert len(data) == 3
+    >>> assert data == OrderedDict({"1": "one", "2": "two", "3": "three"})
+
+    >>> os.remove(path_json)
     """
     with open(path, 'w') as wrt:
       json.dump(dict_, wrt, indent=indentation)
