@@ -3,6 +3,7 @@ import json
 from doctest import testmod
 from itertools import chain
 from typing import Any, List
+from typing import Any, Dict, List
 
 
 def batched(iterable: List[Any], batch_size: int) -> List[List[Any]]:
@@ -157,7 +158,27 @@ def from_txt(path: str) -> str:
         return rd.read().strip()
 
 
-def to_json(dict_: Any, path: str, indentation: int = 4) -> None:
+def from_json(path: str) -> Dict[Any, Any]:
+    """
+    Function that can be directed to a local raw text file by its POSIX path
+    and returns the content of that file as a Python dictionary.
+
+    Parameters
+    ----------
+    path: str
+        The location where the input text data must be stored, as a POSIX path.
+
+    Returns
+    -------
+    str: the dictionary content read from the disk location denoted by the
+    argument of parameter `path`.
+    """
+    with open(path, 'r') as rd:
+        data = json.load(rd, object_pairs_hook=OrderedDict)
+    return data
+
+
+def to_json(dict_: Dict[Any, Any], path: str, indentation: int = 4) -> None:
     """
     Function that expects two parameters as arguments, a Python dictionary and
     a string, and writes the former as the content of a file at the location
