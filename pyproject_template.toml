@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PACKAGE_NAME"
+version = "0.0.1"
+authors = [
+  { name="AUTHOR_NAME", email="AUTHOR_EMAIL" },
+]
+description = ""
+readme = "README.md"
+requires-python = ">=PYTHON_VERSION"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Google page" = "https://www.google.com"

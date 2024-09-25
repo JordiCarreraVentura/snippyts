@@ -104,7 +104,7 @@ python -m pip install --upgrade -r requirements.txt ;
 
 touch "LICENSE" ;
 touch "README.md" ;
-cp "$origin""pyproject.toml" . ;
+cp "$origin""pyproject_template.toml" "./pyproject.toml" ;
 fill_pyproject "$folder_name_" "$python_version_" "$author_name_" "$author_email_" ;
 echo "DONE: Created project files.";
 
