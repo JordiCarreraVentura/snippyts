@@ -1,5 +1,9 @@
 from collections import OrderedDict
 import json
+from pickle import (
+    dump as pdump,
+    load as pload
+)
 
 from doctest import testmod
 from itertools import chain
@@ -256,6 +260,101 @@ def to_json(dict_: Dict[Any, Any], path: str, indentation: int = 4) -> None:
 
 
 
+def to_pickle(data: Any, path: str) -> None:
+    """
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import os
+    >>> path_pickle = "pickle_file.p"
+    >>> assert not os.path.exists(path_pickle)
+
+    >>> data = {1: "one", 2: "two", 3: "three"}
+    >>> to_pickle(data, path_pickle)
+    >>> assert os.path.exists(path_pickle)
+
+    >>> keys = list(data.keys())
+    >>> for key in keys:
+    ...    del data[key]
+    >>> assert len(data) == 0
+
+    >>> try:
+    ...   from_json(path_pickle)
+    ... except Exception:
+    ...   assert True
+
+    >>> try:
+    ...   from_txt(path_pickle)
+    ... except Exception:
+    ...   assert True
+
+    >>> data.update(from_pickle(path_pickle))
+    >>> assert len(data) == 3
+    >>> assert data == {1: "one", 2: "two", 3: "three"}
+
+    >>> os.remove(path_pickle)
+    """
+    with open(path, "wb") as wrt:
+        pdump(data, wrt)
+
+
+def from_pickle(path: str):
+    """
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import os
+    >>> path_pickle = "pickle_file.p"
+    >>> assert not os.path.exists(path_pickle)
+
+    >>> data = {1: "one", 2: "two", 3: "three"}
+    >>> to_pickle(data, path_pickle)
+    >>> assert os.path.exists(path_pickle)
+
+    >>> keys = list(data.keys())
+    >>> for key in keys:
+    ...    del data[key]
+    >>> assert len(data) == 0
+
+    >>> try:
+    ...   from_json(path_pickle)
+    ... except Exception:
+    ...   assert True
+
+    >>> try:
+    ...   from_txt(path_pickle)
+    ... except Exception:
+    ...   assert True
+
+    >>> data.update(from_pickle(path_pickle))
+    >>> assert len(data) == 3
+    >>> assert data == {1: "one", 2: "two", 3: "three"}
+
+    >>> os.remove(path_pickle)
+    """
+    with open(path, "rb") as rd:
+        data = pload(rd)
+    return data
+
+
+
 
 if __name__ == '__main__':
+
+#     path_pickle = "pickle_file.p"
+#     data = {1: "one", 2: "two", 3: "three"}
+#     to_pickle(data, path_pickle)
+#     print(from_pickle(path_pickle))
+#     exit()
+
     testmod()
