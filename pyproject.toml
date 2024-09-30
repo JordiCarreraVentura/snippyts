@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Miscellaneous utility scripts and Python objects for agile development."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
