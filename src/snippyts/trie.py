@@ -1,117 +1,94 @@
-
 from collections import defaultdict as deft
+from typing import Any, Dict, List, Union
 
-from copy import deepcopy as cp
-
-class FailedToApproximateFuzzySearchError(RuntimeError):
-    pass
-
-
-META = '#^%s$#'
+from unidecode import unidecode
 
 
 class Trie:
 
-    def __init__(self):
+    def __init__(
+        self,
+        case_sensitive: bool = False,
+        decode_ascii: bool = True
+    ) -> None:
+        self.case_sensitive = case_sensitive
+        self.decode_ascii = decode_ascii
         self._tree = dict([])
-        self._data = dict([])
-        self.match = None
 
-    def __iadd__(self, W):
-        for w in W:
-            self.add(w)
+    def __iadd__(self, words: List[str]) -> Any:
+        for word in words:
+            self.add(word)
         return self
 
-    def __contains__(self, w):
-        return self.search(w, ratio=1.0)
+    def __preprocess_word(self, word: str) -> str:
+        word = word.lower() if not self.case_sensitive else word
+        if self.decode_ascii:
+            word = unidecode(word)
+        return word
 
-    def add(self, _w):
-        w = _w.lower()
-        parts = list(w)
+    def add(self, word: str) -> None:
+        word = self.__preprocess_word(word)
+        parts = list(word)
         tree = self._tree
         while parts:
             part = parts.pop(0)
             if part not in tree:
                 tree[part] = dict([])
             tree = tree[part]
-        tree[META % w] = True
-        self._data[META % w] = _w
+            if not parts:
+                tree["#"] = True
 
-    def search(self, w, ratio=1.0, min_size=0):
-        self.match = None
-        self.approximation = None
-        return self.__lookup(
-            w, self._tree, [], list(w.lower()), ratio, min_size
+    def __contains__(self, word: str) -> List[str]:
+        return self(w)
+
+    def search(self, word: str) -> List[str]:
+        word = self.__preprocess_word(word)
+        candidates = self.__lookup(
+            word, self._tree, [], list(word), []
         )
+        return candidates
 
-    def __lookup(self, w, tree, history, remainder, ratio, min_size):
+    def __call__(self, word: str) -> List[str]:
+        candidates = self.search(word)
+        return [candidate for candidate in candidates if candidate == word]
+
+    def __lookup(
+        self,
+        word: str,
+        tree: Dict[str, Union[str, Dict]],
+        history: List[str],
+        remainder: List[str],
+        results: List[str],
+    ) -> List[str]:
         part = remainder.pop(0)
-        if part in tree:
-            if not remainder and META % w.lower() in tree[part]:
-                self.match = self._data[META % w.lower()]
-                return True
-            elif remainder:
+        if part not in tree:
+            return results
+        else:
+            tree = tree[part]
+            if remainder:
                 return self.__lookup(
-                    w, tree[part], history + [part], remainder, ratio, min_size
+                    word, tree, history + [part], remainder, results
                 )
             else:
-                return self.approximates(
-                    w, tree, history, remainder, ratio, min_size
-                )
-        else:
-            return self.approximates(
-                w, tree, history, remainder, ratio, min_size
-            )
-        return False
+                return results + self.__pull_all_children(history + [part], tree)
 
-    def approximated(self, tree):
-        has_aproximation = False
-        trees = [tree]
-        while True:
-            _trees = []
-            for _tree in trees:
-                for _key, val in _tree.items():
-                    if val == True:
-                        key = _key.lstrip('#^')
-                        key = key.rstrip('$#')
-                        self.match = self._data[_key]
-                        has_aproximation = True
-                        break
-                    else:
-                        _trees.append(val)
-                if has_aproximation:
-                    break
-            if has_aproximation:
-                break
-            trees = _trees
-            if not trees:
-                break
-        if not has_aproximation:
-            raise FailedToApproximateFuzzySearchError(tree)
-#
-    def approximates(self, w, tree, history, remainder, ratio, min_size):
+    def __pull_all_children(
+        self,
+        history: List[str],
+        tree: List[str]
+    ) -> List[str]:
+        _children = []
+        for key, val in tree.items():
+            if key == "#":
+                _children.append("".join(history))
+                continue
+            _child = [ch for ch in history] + [key]
+            if val.keys():
+                _children += self.__pull_all_children(_child, val)
+            else:
+                _children.append(_child)
+        return _children
 
-        if ratio == 1.0:
-            return False
-        if not (history and remainder):
-            return False
-        elif len(history) < min_size:
-            return False
-
-        self.approximated(tree)
-        if (
-            1 - (len(remainder) / float(len(w))) >= ratio
-            #and (len(history) / float(len(w))) >= ratio
-            and (len(history) / float(len(self.match))) >= ratio
-        ):
-            return True
-        return False
-
-    def __getitem__(self, w):
-        return self._data[w]
-
-    def __len__(self):
-        return len(self._data)
 
 
 def test():
