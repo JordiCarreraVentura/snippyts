@@ -9,6 +9,8 @@ from doctest import testmod
 from itertools import chain
 from typing import Any, Dict, List
 
+from .trie import Trie
+
 
 def batched(iterable: List[Any], batch_size: int) -> List[List[Any]]:
     """
