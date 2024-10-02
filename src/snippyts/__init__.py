@@ -353,10 +353,5 @@ def from_pickle(path: str):
 
 if __name__ == '__main__':
 
-#     path_pickle = "pickle_file.p"
-#     data = {1: "one", 2: "two", 3: "three"}
-#     to_pickle(data, path_pickle)
-#     print(from_pickle(path_pickle))
-#     exit()
-
     testmod()
+
