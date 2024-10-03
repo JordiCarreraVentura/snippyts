@@ -33,22 +33,29 @@ class Trie:
         >>> trie = Trie()
         >>> trie += [
         ...    "orca", "Orco", "orco", "oro",
-        ...    "orwelliano", "oráculo", "oración"
+        ...    "orwelliano", "oráculo", "oración",
         ... ]
-
         >>> assert trie('a') == []
         >>> assert trie.search("a") == []
-
         >>> assert trie('or') == []
         >>> assert trie.search("or") == [
         ...   'orca', 'orco', 'oro',
         ...   'orwelliano', 'oraculo', 'oracion'
         ... ]
-
         >>> assert trie('ora') == []
         >>> assert trie.search("ora") == ['oraculo', 'oracion']
-
         >>> assert trie('orco') == ['orco']
+        >>> assert trie.search("orco") == ['orco']
+
+        >>> trie = Trie(case_sensitive=True)
+        >>> trie += [
+        ...    "orca", "Orco", "orco", "oro", "Orwell",
+        ...    "orwelliano", "oráculo", "oración"
+        ... ]
+        >>> assert trie.search('Or') == ['Orco', 'Orwell']
+        >>> assert trie('ora') == []
+        >>> assert trie.search("ora") == ['oraculo', 'oracion']
+        >>> assert trie('Orco') == ['Orco']
         >>> assert trie.search("orco") == ['orco']
 
         """
