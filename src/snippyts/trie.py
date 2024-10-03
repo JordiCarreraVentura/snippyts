@@ -151,17 +151,11 @@ class Trie:
 
 
 
-def test():
+def test_speed():
 
-#     trie = Trie()
-#     trie.add('Orco')
-#     print(trie.search('a'))
-#     exit()
-
-
-    import json
+    import math
     import random
-    from tqdm import tqdm
+    import time
 
     letters = list('qwertyuiopasdfghjklzxcvbnm')
 
@@ -172,60 +166,33 @@ def test():
         ]
         return ''.join([letters[i] for i in letter_indexes])
 
+    vocab = [random_word() for _ in range(10000)]
+    test_set = [word for word in vocab]
+    for pool_oversample, times_oversampled in [
+        (random.sample(vocab, 100), 1000),
+        (random.sample(vocab, 1000), 100),
+        (random.sample(vocab, 10000), 10)
+    ]:
+        for word in pool_oversample:
+            test_set += [word] * times_oversampled
 
+    n_eval = 10000
     trie = Trie()
-    trie.add('book')
-    print(trie._tree)
+    trie += test_set
+    start = time.time()
+    trie.add("Arda")
+    for w in random.sample(vocab + ["Ard"], n_eval):
+        results = trie.search(w)
+        if w in "Arda":
+            assert True
+    runtime = time.time() - start
+    throughput_second = n_eval * (1 / runtime)
 
-    print('Test "book" given "book", syntax `in` --- %s' % ('book' in trie))
-    print('Test "booklet" given "book", syntax `in` --- %s' % ('booklet' in trie))
-    print('Test "bag" given "book", syntax `in` --- %s' % ('bag' in trie))
-
-    print('Test "book" given "book", syntax `search` --- %s' % trie.search('book'))
-    print('Test "booklet" given "book", syntax `search`  --- %s' % trie.search('booklet'))
-    print('Test "bag" given "book", syntax `search`  --- %s' % trie.search('bag'))
-    print('Test "booklet" given "book", syntax `search`, ratio=0.3  --- %s' % trie.search('booklet', ratio=0.3))
-    print('Test "booklet" given "book", syntax `search`, ratio=0.5  --- %s' % trie.search('booklet', ratio=0.5))
-    print('Test "booklet" given "book", syntax `search`, ratio=0.7  --- %s' % trie.search('booklet', ratio=0.75))
-
-#     exit()
-    n_test_words = 10000
-    tests = set([])
-    true_negatives = set([])
-    while len(tests) < n_test_words:
-        w = random_word()
-        if w in tests:
-            continue
-        if len(tests) < n_test_words - 10:
-            trie.add(w)
-        else:
-            true_negatives.add(w)
-        tests.add(w)
-    print('%d tests' % len(tests))
-    print('%d elements in Trie' % len(trie))
-
-    tp, tn = 0, 0
-    for test in tests:
-        try:
-            if test in true_negatives:
-                assert test not in trie
-                tn += 1
-                print(test, 'True negative (%d)' % tn)
-
-            elif test in tests:
-                assert test in trie
-                tp += 1
-                print(test, 'True positive (%d)' % tp)
-
-            else:
-                raise AssertionError(test)
-
-        except Exception:
-            print(json.dumps(sorted(trie._data), indent=4))
-            print(test)
-            raise AssertionError(test)
+    assert runtime < 0.05
+    assert round(math.log(throughput_second, 10)) >= 5
 
 
 
 if __name__ == '__main__':
-    test()
+    testmod()
+    test_speed()
