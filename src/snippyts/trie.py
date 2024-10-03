@@ -58,6 +58,18 @@ class Trie:
         >>> assert trie('Orco') == ['Orco']
         >>> assert trie.search("orco") == ['orco']
 
+        >>> trie = Trie(decode_ascii=False)
+        >>> trie += [
+        ...    "orca", "Orco", "orco", "oro",
+        ...    "orwelliano", "oráculo", "oración",
+        ... ]
+        >>> assert trie('ora') == []
+        >>> assert trie.search("ora") == ['oración']
+        >>> assert trie("oracion") == []
+        >>> assert trie.search("oracion") == []
+        >>> assert trie("oración") == ['oración']
+        >>> assert trie.search("oració") == ['oración']
+
         """
         self.case_sensitive = case_sensitive
         self.decode_ascii = decode_ascii
