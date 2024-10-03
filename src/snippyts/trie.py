@@ -1,4 +1,5 @@
 from collections import defaultdict as deft
+from doctest import testmod
 from typing import Any, Dict, List, Union
 
 from unidecode import unidecode
@@ -11,6 +12,46 @@ class Trie:
         case_sensitive: bool = False,
         decode_ascii: bool = True
     ) -> None:
+        """
+        Constructor for an instance of a Trie.
+
+        Parameters
+        ----------
+        case_sensitive: bool
+            If set to true, look-up on the Trie is case-sensitive. It is
+            insensitive otherwise (and by default).
+
+        decode_ascii: bool
+            If set to false, non-ASCII strings are first decoded into ASCII strings
+            are then added to the Trie. The Trie will thus return matches for the
+            ASCII strings, not the original ones. No mapping between both encodings
+            is kept inside the Trie and it should be implemented if needed.
+
+
+        Examples
+        --------
+        >>> trie = Trie()
+        >>> trie += [
+        ...    "orca", "Orco", "orco", "oro",
+        ...    "orwelliano", "oráculo", "oración"
+        ... ]
+
+        >>> assert trie('a') == []
+        >>> assert trie.search("a") == []
+
+        >>> assert trie('or') == []
+        >>> assert trie.search("or") == [
+        ...   'orca', 'orco', 'oro',
+        ...   'orwelliano', 'oraculo', 'oracion'
+        ... ]
+
+        >>> assert trie('ora') == []
+        >>> assert trie.search("ora") == ['oraculo', 'oracion']
+
+        >>> assert trie('orco') == ['orco']
+        >>> assert trie.search("orco") == ['orco']
+
+        """
         self.case_sensitive = case_sensitive
         self.decode_ascii = decode_ascii
         self._tree = dict([])
