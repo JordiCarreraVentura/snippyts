@@ -13,7 +13,13 @@ class Trie:
         decode_ascii: bool = True
     ) -> None:
         """
-        Constructor for an instance of a Trie.
+        Constructor for an instance of a trie that allows for very fast exact
+        string look-up (methods `call`, `contains`) as well as fast substring
+        search by prefix (method `search`).
+
+        Terms can be added to the trie either with incremental sum
+        (`trie += list[str]`) or using the method `add`. Refer to the examples
+        for details.
 
         Parameters
         ----------
@@ -76,6 +82,19 @@ class Trie:
         self._tree = dict([])
 
     def __iadd__(self, words: List[str]) -> Any:
+        """
+        Parameters
+        ----------
+        word: List[str]
+            A wrapper around the `add` method that supports
+            iterable objects as input, for convenience.
+
+        Returns
+        -------
+        snippyts.Trie
+            The same object the method has been called on.
+
+        """
         for word in words:
             self.add(word)
         return self
@@ -87,6 +106,17 @@ class Trie:
         return word
 
     def add(self, word: str) -> None:
+        """
+        Parameters
+        ----------
+        word: str
+            New term to be added to the trie.
+
+        Returns
+        -------
+        Nothing.
+
+        """
         word = self.__preprocess_word(word)
         parts = list(word)
         tree = self._tree
@@ -98,10 +128,49 @@ class Trie:
             if not parts:
                 tree["#"] = True
 
-    def __contains__(self, word: str) -> List[str]:
-        return self(w)
+    def __contains__(self, word: str) -> bool:
+        """
+        Parameters
+        ----------
+        word: str
+            A string of arbitrary length to look up on the trie.
+
+        Returns
+        -------
+        bool
+            True if the trie contains the value denoted by the input
+            argument, and False otherwise.
+
+            A full match is required (over all the characters in the input
+            string), otherwise no matches are returned and none are assumed
+            to exist.
+
+            Note that this method is a wrapper around the class's call.
+
+            To get matches for partial strings, use method `search` instead.
+        """
+        return True if self(w) else False
 
     def search(self, word: str) -> List[str]:
+        """
+        Parameters
+        ----------
+        word: str
+            A string of arbitrary length to look up on the trie.
+
+            The value can denote both a partial string or a full string.
+            Regardless, method `search` will return all matches of that
+            string, including longer terms the matching string is a substring
+            of. To force full matches, call the class itself, or invoke its
+            `contains` method.
+
+        Returns
+        -------
+        List[str]
+            A list with all the strings matching the input substring provided
+            as the value of argument `word`.
+
+        """
         word = self.__preprocess_word(word)
         candidates = self.__lookup(
             word, self._tree, [], list(word), []
@@ -109,6 +178,24 @@ class Trie:
         return candidates
 
     def __call__(self, word: str) -> List[str]:
+        """
+        Parameters
+        ----------
+        word: str
+            A string of arbitrary length to look up on the trie.
+
+        Returns
+        -------
+        bool
+            True if the trie contains the value denoted by the input
+            argument, and False otherwise.
+
+            A full match is required (over all the characters in the input
+            string), otherwise no matches are returned and none are assumed
+            to exist.
+
+            To get matches for partial strings, use method `search` instead.
+        """
         candidates = self.search(word)
         return [candidate for candidate in candidates if candidate == word]
 
