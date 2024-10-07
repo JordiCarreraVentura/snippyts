@@ -1,8 +1,13 @@
-# Virtual environment
+# virtual environment
 bin/*
 etc/*
 lib/*
 pyvenv.cfg
 share/*
+
+# Python package
 dist/snippyts*
 src/snippyts.egg-info/*
+
+# Python cache
+src/snippyts/__pycache__/*

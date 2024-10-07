@@ -279,7 +279,10 @@ def test_speed():
     assert round(math.log(throughput_second, 10)) >= 5
 
 
-
-if __name__ == '__main__':
+def test():
     testmod()
     test_speed()
+
+
+if __name__ == '__main__':
+    test()

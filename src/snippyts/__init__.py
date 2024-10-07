@@ -9,7 +9,16 @@ from doctest import testmod
 from itertools import chain
 from typing import Any, Dict, List
 
-from .trie import Trie
+from .trie import (
+    test as test_trie,
+    Trie
+)
+from .vocabulary_tools import (
+    ExactStringMatcher,
+    FuzzyStringMatcher,
+    StringMatcher,
+    test as test_vocabulary_tools
+)
 
 
 def batched(iterable: List[Any], batch_size: int) -> List[List[Any]]:
@@ -352,6 +361,7 @@ def from_pickle(path: str):
 
 
 if __name__ == '__main__':
-
     testmod()
+    test_trie()
+    test_vocabulary_tools()
 
