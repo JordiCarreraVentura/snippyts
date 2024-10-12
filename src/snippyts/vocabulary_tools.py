@@ -55,7 +55,7 @@ class StringMatcher:
         return json.dumps(meta)
 
     def __call__(self, documents: str):
-        if not isinstance(documents, str):
+        if isinstance(documents, str):
             return self([documents]).pop()
         func = self.vocab.extract_keywords if self.exact \
                else self.vocab.get
