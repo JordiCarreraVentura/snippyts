@@ -87,7 +87,7 @@ class StringMatcher:
 
     def __contains__(self, word: str) -> bool:
         if self.exact:
-            raise NotImplementedError()
+            return True if self(word) else False
         else:
             matches = self.vocab.get(word)
             return True if matches else False
