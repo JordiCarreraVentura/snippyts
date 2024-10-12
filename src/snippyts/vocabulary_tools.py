@@ -199,6 +199,7 @@ def test():
     test_exact_iadd_words()
     test_exact_contains_word()
     test_exact_filter_words()
+    test_exact_extract_words()
     terms = [
        "orca", "Orco", "orco", "oro",
        "orwelliano", "oráculo", "oración",
