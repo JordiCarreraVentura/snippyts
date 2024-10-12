@@ -82,6 +82,9 @@ class StringMatcher:
     def fit(self, words: List[str]) -> None:
         self += words
 
+    def filter(self, words: List[str]) -> bool:
+        return [word in self for word in words]
+
     def __contains__(self, word: str) -> bool:
         if self.exact:
             raise NotImplementedError()
