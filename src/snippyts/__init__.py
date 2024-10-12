@@ -16,8 +16,8 @@ from .trie import (
 from .vocabulary_tools import (
     ExactStringMatcher,
     FuzzyStringMatcher,
+    NestedObjectsNotSupportedError,
     StringMatcher,
-    test as test_vocabulary_tools
 )
 
 
@@ -363,5 +363,4 @@ def from_pickle(path: str):
 if __name__ == '__main__':
     testmod()
     test_trie()
-    test_vocabulary_tools()
 
