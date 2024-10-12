@@ -174,6 +174,25 @@ def test_exact_filter_words():
 
 
 
+def test_exact_extract_words():
+
+    terms = ["uno", "dos", "tres"]
+    sm = ExactStringMatcher()
+    sm += terms
+
+    text = " ".join([
+        "dos", "cinco", "tres", "cuatro",
+        "seis", "siete", "ocho", "nueve",
+        "dieciseis", "doce", "cuarenta", "diantres",
+        "dos", "tres", "tres"
+    ])
+    expected = "dos tres dos tres tres".split()
+
+    extracted = sm(text)
+    assert extracted == expected
+
+
+
 def test():
 
     test_exact_add_words()
