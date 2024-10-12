@@ -1,3 +1,5 @@
+import json
+
 from flashtext2 import KeywordProcessor
 
 try:
