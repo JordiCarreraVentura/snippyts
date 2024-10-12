@@ -1,3 +1,4 @@
+from functools import wraps
 import json
 
 from flashtext2 import KeywordProcessor
@@ -11,11 +12,31 @@ from typing import Any, List, Tuple, Union
 
 
 
-class AttemptedToAddTupleToFuzzyVocabulary(RuntimeError):
+class AttemptedToAddTupleToFuzzyVocabulary(AttributeError):
+    pass
+
+class NestedObjectsNotSupportedError(ValueError):
     pass
 
 class OperationNotYetSupportedForFuzzyVocabulary(NotImplementedError):
     pass
+
+
+
+
+def reject_nested_input(method):
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+
+        if args \
+        and isinstance(args[0], list) \
+        and isinstance(args[0][0], list):
+            raise NestedObjectsNotSupportedError(args[0])
+
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 
@@ -54,6 +75,7 @@ class StringMatcher:
         meta.update({key: self.__dict__[key] for key in meta_keys})
         return json.dumps(meta)
 
+    @reject_nested_input
     def __call__(self, documents: str):
         if isinstance(documents, str):
             return self([documents]).pop()
@@ -61,6 +83,7 @@ class StringMatcher:
                else self.vocab.get
         return [func(document) for document in documents]
 
+    @reject_nested_input
     def add(self, word: Union[str, Tuple[str]]) -> None:
         if isinstance(word, tuple) and self.exact:
             self.add_mapping(*word)
@@ -74,14 +97,17 @@ class StringMatcher:
     def add_mapping(self, word_from: str, word_to: str) -> None:
         self.vocab.add_keyword(word_from, word_to)
 
+    @reject_nested_input
     def __iadd__(self, words: List[str]) -> Any:
         for word in words:
             self.add(word)
         return self
 
+    @reject_nested_input
     def fit(self, words: List[str]) -> None:
         self += words
 
+    @reject_nested_input
     def filter(self, words: List[str]) -> bool:
         return [word in self for word in words]
 
@@ -92,6 +118,7 @@ class StringMatcher:
             matches = self.vocab.get(word)
             return True if matches else False
 
+    @reject_nested_input
     def transform(self, documents: List[str]) -> List[str]:
         if not self.exact:
             raise OperationNotYetSupportedForFuzzyVocabulary()
@@ -193,27 +220,91 @@ def test_exact_extract_words():
 
 
 
-def test():
+def test_exact_extract_words():
 
+    terms = [
+        ("uno", "1"),
+        ("dos", "2"),
+        ("tres", "3")
+    ]
+    sm = ExactStringMatcher()
+    sm += terms
+
+    text = " ".join([
+        "dos", "cinco", "tres", "cuatro",
+        "seis", "siete", "ocho", "nueve",
+        "dieciseis", "doce", "cuarenta", "diantres",
+        "dos", "tres", "tres"
+    ])
+    expected = "2 cinco 3 cuatro seis siete ocho nueve "\
+               "dieciseis doce cuarenta diantres 2 3 3"
+
+    transformed = sm.transform(text)
+    assert transformed == expected
+
+
+
+def test_exact_extract_words_many():
+
+    terms = [
+        ("uno", "1"),
+        ("dos", "2"),
+        ("tres", "3")
+    ]
+    sm = ExactStringMatcher()
+    sm += terms
+
+    documents = [
+        "dos", "cinco", "tres", "cuatro",
+        "seis", "siete", "ocho", "nueve",
+        "dieciseis", "doce", "cuarenta", "diantres",
+        "dos", "tres", "tres"
+    ]
+    expected = [
+        "2", "cinco", "3", "cuatro",
+        "seis", "siete", "ocho", "nueve",
+        "dieciseis", "doce", "cuarenta", "diantres",
+        "2", "3", "3"
+    ]
+
+    transformed = sm.transform(documents)
+    assert transformed == expected
+
+
+
+def test_exact_reject_nested_inputs():
+
+    terms = [
+        ("uno", "1"),
+        ("dos", "2"),
+        ("tres", "3")
+    ]
+    sm = ExactStringMatcher()
+    sm += terms
+
+    documents = [
+        "dos", "cinco", "tres", "cuatro",
+        "seis", "siete", "ocho", "nueve",
+        "dieciseis", "doce", "cuarenta", "diantres",
+        "dos", "tres", "tres"
+    ]
+
+    try:
+        sm.transform([documents])
+    except NestedObjectsNotSupportedError:
+        assert True
+
+
+
+def test():
     test_exact_add_words()
     test_exact_iadd_words()
     test_exact_contains_word()
     test_exact_filter_words()
     test_exact_extract_words()
-    terms = [
-       "orca", "Orco", "orco", "oro",
-       "orwelliano", "oráculo", "oración",
-    ]
+    test_exact_extract_words_many()
+    test_exact_reject_nested_inputs()
 
-    fsm = FuzzyStringMatcher(min_sim_retrieval=0.5)
-    fsm += terms
-    for term in terms:
-        print(term, fsm(term))
-
-    esm = ExactStringMatcher()
-    esm += terms
-    for term in terms:
-        print(term, esm(term))
 
 
 
