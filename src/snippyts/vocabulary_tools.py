@@ -39,11 +39,6 @@ class StringMatcher:
                 rel_sim_cutoff=self.min_sim_retrieval,
             )
 
-    def __call__(self, word: str):
-        if self.exact:
-            return self.vocab.extract_keywords(word)
-        else:
-            return self.vocab.get(word)
     def __str__(self):
         meta_keys = [
             "min_sim_retrieval",
@@ -57,6 +52,12 @@ class StringMatcher:
         meta.update({key: self.__dict__[key] for key in meta_keys})
         return json.dumps(meta)
 
+    def __call__(self, documents: str):
+        if not isinstance(documents, str):
+            return self([documents]).pop()
+        func = self.vocab.extract_keywords if self.exact \
+               else self.vocab.get
+        return [func(document) for document in documents]
 
     def add(self, word: Union[str, Tuple[str]]) -> None:
         if isinstance(word, tuple) and self.exact:
@@ -89,11 +90,13 @@ class StringMatcher:
     def transform(self, documents: List[str]) -> List[str]:
         if not self.exact:
             raise OperationNotYetSupportedForFuzzyVocabulary()
-        return [
-            self.vocab.replace_keywords(document)
-            for document in documents
-        ]
-
+        if isinstance(documents, str):
+            return self.transform([documents]).pop()
+        else:
+            return [
+                self.vocab.replace_keywords(document)
+                for document in documents
+            ]
 
 
 class ExactStringMatcher(StringMatcher):
