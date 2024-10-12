@@ -11,3 +11,4 @@ src/snippyts.egg-info/*
 
 # Python cache
 src/snippyts/__pycache__/*
+tests/__pycache__/*
