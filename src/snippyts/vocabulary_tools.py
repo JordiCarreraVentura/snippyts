@@ -44,6 +44,19 @@ class StringMatcher:
             return self.vocab.extract_keywords(word)
         else:
             return self.vocab.get(word)
+    def __str__(self):
+        meta_keys = [
+            "min_sim_retrieval",
+            "case_sensitive",
+            "exact"
+        ]
+        meta = {
+            'current': str(self.__class__.__name__),
+            'parent': str(self.__class__.__base__),
+        }
+        meta.update({key: self.__dict__[key] for key in meta_keys})
+        return json.dumps(meta)
+
 
     def add(self, word: Union[str, Tuple[str]]) -> None:
         if isinstance(word, tuple) and self.exact:
