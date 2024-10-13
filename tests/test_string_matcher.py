@@ -251,7 +251,7 @@ def test_fuzzy_filter_words():
 
     sm = FuzzyStringMatcher(min_sim_retrieval=0.2, min_sim=0.6)
     sm += terms
-    expected = [True, True, lse]
+    expected = [True, True, False]
     filtered = sm.filter(words)
     assert filtered == expected
 
