@@ -40,14 +40,17 @@ def reject_nested_input(method):
 
 
 
+
 class StringMatcher:
 
     def __init__(
         self,
+        min_sim: float = 0.5,
         min_sim_retrieval: float = 0.6,
         case_sensitive: bool = False,
         exact: bool = False,
     ):
+        self.min_sim = min_sim
         self.min_sim_retrieval = min_sim_retrieval
         self.exact = exact
         self.case_sensitive = case_sensitive
@@ -76,12 +79,29 @@ class StringMatcher:
         return json.dumps(meta)
 
     @reject_nested_input
-    def __call__(self, documents: str):
+    def __call__(self, documents: Union[str, List[str]]):
         if isinstance(documents, str):
             return self([documents]).pop()
         func = self.vocab.extract_keywords if self.exact \
                else self.vocab.get
-        return [func(document) for document in documents]
+        matches = []
+        for document in documents:
+            _matches = func(document)
+            matches.append(_matches if _matches else [])
+        return self.__filter_by_jaro_distance(matches)
+
+    def __filter_by_jaro_distance(
+        self,
+        matches: List[Union[str, Tuple[float, str]]]
+    ) -> List[Union[str, Tuple[float, str]]]:
+        if isinstance(self, ExactStringMatcher):
+            return matches
+        else:
+            return [
+                [ (score, text) for score, text in _match
+                  if score >= self.min_sim ]
+                for _match in matches
+            ]
 
     @reject_nested_input
     def add(self, word: Union[str, Tuple[str]]) -> None:
@@ -112,11 +132,7 @@ class StringMatcher:
         return [word in self for word in words]
 
     def __contains__(self, word: str) -> bool:
-        if self.exact:
-            return True if self(word) else False
-        else:
-            matches = self.vocab.get(word)
-            return True if matches else False
+        return True if self(word) else False
 
     @reject_nested_input
     def transform(self, documents: List[str]) -> List[str]:
