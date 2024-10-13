@@ -150,6 +150,54 @@ class StringMatcher:
 class ExactStringMatcher(StringMatcher):
 
     def __init__(self, *args, **kwargs) -> None:
+        """
+        A wrapper around flashtext2's `KeywordProcessor` class. It is intended
+        to provide a unified API for it and for fuzzyset's `FuzzySet` class,
+        with the former implementing high-performance exact string matching,
+        and the latter implementing high-performance fuzzy string matching.
+
+        Parameters
+        ----------
+        case_sensitive: bool
+            Controls the case sensitivity of the string matching'.
+            Defaults to `False`.
+
+        Examples
+        --------
+        >>> terms = ["uno", "dos"]
+        >>> sm = ExactStringMatcher(case_sensitive=True)
+        >>> sm += terms
+        >>> sm.add("tres")
+
+        >>> sm("Uno")
+        []
+
+        >>> sm('dos')
+        ['dos']
+
+        >>> sm(["dos dos", "tres"])
+        [['dos', 'dos'], ['tres']]
+
+        >>> sm(["dos dos", "tres", "cuatro"])
+        [['dos', 'dos'], ['tres'], []]
+
+        >>> sm.filter(["dos dos", "tres", "cuatro"])
+        [True, True, False]
+
+        >>> sm = ExactStringMatcher(case_sensitive=True)
+        >>> sm += [
+        ...   ("uno", "1"),
+        ...   ("dos", "2"),
+        ...   ("tres", "3"),
+        ... ]
+        >>> sm.transform(["dos dos", "tres", "cuatro"])
+        ['2 2', '3', 'cuatro']
+
+        >>> text = "dos dos. tres. cuatro"
+        >>> sm.transform(text)
+        '2 2. 3. cuatro'
+
+        """
         params = dict(kwargs)
         params["exact"] = True
         super().__init__(*args, **params)
@@ -159,8 +207,57 @@ class ExactStringMatcher(StringMatcher):
 class FuzzyStringMatcher(StringMatcher):
 
     def __init__(self, *args, **kwargs) -> None:
+        """
+        A wrapper around `fuzzyset`'s `FuzzySet` class. This class is intended
+        to provide a unified API for fuzzy string matching in conjunction with
+        the `ExactStringMatcher` class, which focuses on exact matching. This
+        class uses Levenshtein distance for high-performance fuzzy string
+        matching.
+
+        Parameters
+        ----------
+        min_sim : float
+            The minimum similarity threshold for considering two strings a match.
+            Defaults to 0.5.
+
+        min_sim_retrieval : float
+            The minimum similarity required for retrieving potential matches
+            from the fuzzy set. Defaults to 0.6.
+
+        case_sensitive : bool
+            Controls the case sensitivity of the string matching. Defaults to `False`.
+
+        Examples
+        --------
+        >>> terms = ["apple", "banana", "cherry"]
+        >>> sm = FuzzyStringMatcher(min_sim=0.7)
+        >>> sm += terms
+        >>> sm.add("grape")
+
+        >>> sm("aple")
+        [(0.8, 'apple')]
+
+        >>> sm('banana')
+        [(1.0, 'banana')]
+
+        >>> sm(["aple", "grap", "pineapple"])
+        [[(0.8, 'apple')], [(0.8, 'grape')], []]
+
+        >>> sm.filter(["apple", "grape", "kiwi"])
+        [True, True, False]
+
+        Notes
+        -----
+        This class leverages fuzzy string matching based on Levenshtein distance
+        to find approximate matches in a vocabulary, and the retrieval process
+        is filtered by a configurable minimum similarity threshold. It also
+        shares the core API structure with `ExactStringMatcher`.
+        """
         params = dict(kwargs)
         params["exact"] = False
         super().__init__(*args, **params)
 
 
+if __name__ == "__main__":
+    from doctest import testmod
+    testmod()

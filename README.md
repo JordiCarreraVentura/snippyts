@@ -20,8 +20,8 @@ Miscellaneous utility scripts and Python objects for agile development.
 | 8 | `snippyts.__init__.to_pickle` | Function that can be directed to a local raw text file by its POSIX path and returns the content of that file as a Python dictionary. | October 3rd, 2024 | October 3rd, 2024 |
 | 9 | `snippyts.__init__.from_pickle` | Function that can be directed to a local Python-pickle file by its POSIX path and returns a copy of the artifact  persisted in that file. | October 3rd, 2024 | October 3rd, 2024 |
 | 10 | `snippyts.trie.Trie` | A class implementing a [trie](https://en.wikipedia.org/wiki/Trie) data structure. | October 3rd, 2024 | October 3rd, 2024 |
-| 11 | `snippyts.vocabulary_tools.ExactStringMatcher` | A wrapper around `flashtext2` providing a unified application interface shared with `FuzzySet`. | October 12th, 2024 | October 12th, 2024 |
-| 12 | `snippyts.vocabulary_tools.FuzzyStringMatcher` | **PENDING** | **PENDING**| **PENDING** |
+| 11 | `snippyts.vocabulary_tools.ExactStringMatcher` | A wrapper around `flashtext2` providing a unified application interface shared with `FuzzySet`. | October 12th, 2024 | October 13th, 2024 |
+| 12 | `snippyts.vocabulary_tools.FuzzyStringMatcher` | A wrapper around `FuzzySet` providing a unified application interface shared with `flashtext2`. | October 13th, 2024 | October 13th, 2024 |
 
 
 # Running tests

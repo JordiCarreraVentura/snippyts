@@ -130,7 +130,6 @@ def test_exact_extract_words_many():
     assert transformed == expected
 
 
-
 def test_exact_reject_nested_inputs():
 
     terms = [
