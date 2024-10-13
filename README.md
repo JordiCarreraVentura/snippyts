@@ -26,7 +26,7 @@ Miscellaneous utility scripts and Python objects for agile development.
 
 # Running tests
 
-### Using `pytest`
+### Using `pytest`
 
 Change into the project's home folder (first line below) and run `pytest` (second line). After moving into that directory, the working folder should contain two subfolders, `src` (in turn the parent of subfolder `snippyts`) and `tests`:
 
