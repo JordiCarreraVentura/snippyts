@@ -209,6 +209,7 @@ def to_csv(
     >>> assert os.path.exists(test_path)
     >>> assert os.path.isfile(test_path)
     >>> assert from_csv(test_path) == data
+    >>> assert data[0][1] == "Age"
 
     >>> os.remove(test_path)
     """
@@ -243,6 +244,7 @@ def from_csv(path: str, delimiter: str = ",") -> List[List[str]]:
     >>> assert os.path.exists(test_path)
     >>> assert os.path.isfile(test_path)
     >>> assert from_csv(test_path) == data
+    >>> assert data[0][1] == "Age"
 
     >>> os.remove(test_path)
     """
