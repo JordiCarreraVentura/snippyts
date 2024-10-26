@@ -20,8 +20,10 @@ Miscellaneous utility scripts and Python objects for agile development.
 | 8 | `snippyts.__init__.to_pickle` | Function that can be directed to a local raw text file by its POSIX path and returns the content of that file as a Python dictionary. | October 3rd, 2024 | October 3rd, 2024 |
 | 9 | `snippyts.__init__.from_pickle` | Function that can be directed to a local Python-pickle file by its POSIX path and returns a copy of the artifact  persisted in that file. | October 3rd, 2024 | October 3rd, 2024 |
 | 10 | `snippyts.trie.Trie` | A class implementing a [trie](https://en.wikipedia.org/wiki/Trie) data structure. | October 3rd, 2024 | October 3rd, 2024 |
-| 11 | `snippyts.vocabulary_tools.ExactStringMatcher` | A wrapper around `flashtext2` providing a unified application interface shared with `FuzzySet`. | October 12th, 2024 | October 13th, 2024 |
-| 12 | `snippyts.vocabulary_tools.FuzzyStringMatcher` | A wrapper around `FuzzySet` providing a unified application interface shared with `flashtext2`. | October 13th, 2024 | October 13th, 2024 |
+| 11 | `snippyts.vocabulary_tools.ExactStringMatcher` | A wrapper around `flashtext2` providing a unified application interface shared with `FuzzySet`. | October 12th, 2024 | October 26th, 2024 |
+| 12 | `snippyts.vocabulary_tools.FuzzyStringMatcher` | A wrapper around `FuzzySet` providing a unified application interface shared with `flashtext2`. | October 13th, 2024 | October 26th, 2024 |
+| 13 | `snippyts.__init__.to_csv` | Function that expects two parameters as arguments, a list of lists (or, more geneally, an Iterable contaning other Iterables which is expected to represent a CSV-structured matrix) and a string, and writes the former as the content of a file at the location denoted by the latter (which is assumed to denote a POSIX path). | October 26th, 2024 | October 26th, 2024 |
+| 14 | `snippyts.__init__.from_csv` | Function that can be directed to a local CSV file by its POSIX path and returns the content of that file as a list of lists (or, more geneally, an Iterable contaning other Iterables which is expected to represent a CSV-structured matrix). | October 26th, 2024 | October 26th, 2024 |
 
 
 # Running tests

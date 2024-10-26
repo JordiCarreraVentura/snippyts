@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import csv
 import json
 from pickle import (
     dump as pdump,
@@ -7,7 +8,7 @@ from pickle import (
 
 from doctest import testmod
 from itertools import chain
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List
 
 from .trie import (
     test as test_trie,
@@ -171,6 +172,83 @@ def from_txt(path: str) -> str:
     """
     with open(path, 'r') as rd:
         return rd.read().strip()
+
+
+
+def to_csv(
+    data: List[Iterable[Any]],
+    path: str,
+    delimiter: str = ","
+) -> None:
+    """
+    Function that expects a list of iterables (representing rows of printable
+    objects) and a string denoting a path, and writes the data to a csv file
+    at the path.
+
+    Parameters
+    ----------
+    data: List[List[str]]
+        Some tabular data to write to disk.
+
+    path: str
+        The location where the input data must be stored, as a POSIX path.
+
+    Returns
+    -------
+    Nothing, writes the value stored in input variable `data` to the disk
+    location denoted by `path`.
+
+    Examples
+    --------
+    >>> import os
+    >>> test_path = "./test_path.csv"
+    >>> data = [["Name", "Age"], ["John", "30"], ["Jane", "25"]]
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_csv(data, test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_csv(test_path) == data
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'w', newline='') as wrt:
+        writer = csv.writer(wrt, delimiter=delimiter)
+        writer.writerows(data)
+
+
+def from_csv(path: str, delimiter: str = ",") -> List[List[str]]:
+    """
+    Function that can be directed to a local csv file by its POSIX path
+    and returns the content of that file as a list of lists of strings.
+
+    Parameters
+    ----------
+    path: str
+        The location where the input data is stored, as a POSIX path.
+
+    Returns
+    -------
+    List[List[str]]: the tabular content read from the disk location denoted by the
+    argument of parameter `path`.
+
+    Examples
+    --------
+    >>> import os
+    >>> test_path = "./test_path.csv"
+    >>> data = [["Name", "Age"], ["John", "30"], ["Jane", "25"]]
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_csv(data, test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_csv(test_path) == data
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'r') as rd:
+        reader = csv.reader(rd, delimiter=delimiter)
+        return list(reader)
 
 
 def from_json(path: str) -> Dict[Any, Any]:
