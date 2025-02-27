@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "snippyts"
 version = "0.2.0"
 authors = [
-  { name="Jordi Carrera Ventura", email="jordi.carrera.ventura@gmail.com" },
+  { name="Jordi Carrera Ventura", email="jordi.carrera.ventura@gmail.com" }
 ]
 description = "Miscellaneous utility scripts and Python objects for agile development."
 readme = "README.md"
