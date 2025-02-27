@@ -1,14 +1,16 @@
 from collections import OrderedDict
 import csv
 import json
+import requests
 from pickle import (
     dump as pdump,
     load as pload
 )
+from urllib.parse import urlparse
 
 from doctest import testmod
 from itertools import chain
-from typing import Any, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List
 
 from .trie import (
     test as test_trie,
@@ -20,6 +22,124 @@ from .vocabulary_tools import (
     NestedObjectsNotSupportedError,
     StringMatcher,
 )
+
+
+class NotAUrlError(ValueError):
+    pass
+    
+class ConnectionFailedError(RuntimeError):
+    pass
+    
+class HtmlDocumentParseError(RuntimeError):
+    pass
+
+
+def tryline(_call: Callable, exception: Exception, *args, **kwargs) -> Any:
+    """
+    Wraps a try-raise block into a single statement. It is intended to
+    flatten try-catch
+    
+    It attempts to call the specified Python-callable object with the provided 
+    arguments and keyword arguments.
+    
+    If the call is successful, it silently returns the output of the call.
+    If it fails, it raises an exception of the type provided as the second
+    argument.
+    
+    Parameters
+    ----------
+    _call: object
+        Any Python object that can be called on the specified arguments.
+    
+    exception: Exception
+        The exception that must be raised if the call fails.
+    
+    *args: List[Any]
+        Its standard meaning.
+        
+    **kwargs: Dict[str, Any]
+        Its standard meaning.
+    
+    Returns
+    -------
+    object:
+        Whichever object is returned by the call to the callable object.
+    
+    Examples
+    --------
+    >>> class CustomError(Exception):
+    ...   pass
+
+    >>> assert tryline(sum, CustomError, [1, 1]) == 2
+    >>> tryline(
+    ...   lambda x, y: x + "." + y,
+    ...   CustomError,
+    ...   'text',
+    ...   'and more text'
+    ... )
+    'text.and more text'
+    
+    >>> try:
+    ...   tryline(sum, CustomError, ['text', 1])
+    ... except CustomError:
+    ...   assert True
+    
+    >>> try:
+    ...   tryline(lambda x, y: x + "." + y, CustomError, 'text', 1)
+    ... except CustomError:
+    ...   assert True
+    """
+    try:
+        return _call(*args, **kwargs)
+    except Exception:
+        raise exception(args)
+
+
+def is_url(url: str) -> bool:
+    """
+    Determines whether a given string is a valid URL.
+    
+    It uses urllib.parse.urlparse, a function that splits a URL into six 
+    components: scheme, network location, path, parameters, query, and 
+    fragment. 
+    
+    A string is considered a URL if both the scheme and the network location
+    components exist, and the scheme is http or https.
+    
+    Parameters
+    ----------
+    url : str
+        The string to be checked.
+    
+    Returns
+    -------
+    bool
+        True if the input string is a valid URL, False otherwise.
+    
+    Raises
+    ------
+    NotAUrlError
+        If the string is not a URL, it raises a NotAUrlError.
+    
+    Examples
+    --------
+    >>> is_url("https://www.google.com")
+    True
+
+    >>> try:
+    ...   is_url("not a url")
+    ... except NotAUrlError:
+    ...   assert True
+    """
+    
+    try:
+        result = urlparse(url)
+        assert result.scheme in ['http', 'https']
+        assert all([result.scheme, result.netloc])
+        return True
+    except Exception:
+        raise NotAUrlError()
+        return False
 
 
 def batched(iterable: List[Any], batch_size: int) -> List[List[Any]]:
@@ -437,6 +557,54 @@ def from_pickle(path: str):
         data = pload(rd)
     return data
 
+
+def gtml(url: str) -> str:
+    """
+    Gets the HTML content of the document at the specified location URL.
+    
+    Parameters
+    ----------
+    url: str
+       URL pointing to an HTML document.
+    
+    Returns
+    -------
+    str
+       The text of the HTML document.
+    
+    Raises
+    ------
+    NotaUrlError
+       The input is not a URL.
+
+    ConnectionFailedError
+        The input URL is correct but it could not be fetched.
+       
+    HtmlDocumentParseError
+        The input URL is correct and it was correctly fetched, but no text
+        could be parsed.
+    
+    Examples
+    -------
+    
+    # Provided input cannot be parsed as a URL:
+    >>> try:
+    ...   gtml("hts://stackoverflow.com/questions/4075190/"
+    ...        "what-is-how-to-use-getattr-in-python")
+    ... except NotAUrlError:
+    ...   assert True
+    
+    # Working as intended:
+    >>> html = gtml("https://example.com")
+    >>> assert len(html) == 1256
+    >>> html = ''.join(html.splitlines()).replace('"', "'") 
+    >>> assert html == "<!doctype html><html><head>    <title>Example Domain</title>    <meta charset='utf-8' />    <meta http-equiv='Content-type' content='text/html; charset=utf-8' />    <meta name='viewport' content='width=device-width, initial-scale=1' />    <style type='text/css'>    body {        background-color: #f0f0f2;        margin: 0;        padding: 0;        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;            }    div {        width: 600px;        margin: 5em auto;        padding: 2em;        background-color: #fdfdff;        border-radius: 0.5em;        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);    }    a:link, a:visited {        color: #38488f;        text-decoration: none;    }    @media (max-width: 700px) {        div {            margin: 0 auto;            width: auto;        }    }    </style>    </head><body><div>    <h1>Example Domain</h1>    <p>This domain is for use in illustrative examples in documents. You may use this    domain in literature without prior coordination or asking for permission.</p>    <p><a href='https://www.iana.org/domains/example'>More information...</a></p></div></body></html>"
+    """
+    tryline(is_url, NotAUrlError, url)
+    response = tryline(requests.get, ConnectionFailedError, url)
+    response = requests.get(url)
+    response.raise_for_status()
+    return tryline(getattr, HtmlDocumentParseError, response, "text")
 
 
 
