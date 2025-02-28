@@ -2,7 +2,7 @@
 
 Miscellaneous utility scripts and Python objects for agile development.
 
-1. [Table of ojects](#table-of-objects)
+1. [Table of objects](#table-of-objects)
 2. [Instructions for running tests](#running-tests)
 
 
