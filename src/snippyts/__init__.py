@@ -560,7 +560,7 @@ def from_pickle(path: str):
 
 def gtml(url: str) -> str:
     """
-    Gets the HTML content of the document at the specified location URL.
+    Gets the HTML content of the document at the specified location URL. Named `gtml` as a shorthand for "get HTML".
     
     Parameters
     ----------
