@@ -12,4 +12,9 @@ src/snippyts.egg-info/*
 # Python cache
 src/snippyts/__pycache__/*
 tests/__pycache__/*
+
+# MacOS system files
 .DS_Store
+
+# Documentation (local)
+doc/DEV.txt
