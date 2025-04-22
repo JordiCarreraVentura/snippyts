@@ -45,5 +45,6 @@ pytest tests ;
 
 ```
 cd snippyts ;
-python -m src.snippyts.__init__
+python -m src.snippyts.__init__ ;
+python -m src.snippyts.preprocessing ;
 ```

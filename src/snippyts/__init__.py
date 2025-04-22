@@ -1,7 +1,8 @@
-from collections import OrderedDict
 import csv
 import json
 import requests
+from collections.abc import Iterable
+from collections import OrderedDict
 from pickle import (
     dump as pdump,
     load as pload
@@ -32,6 +33,56 @@ class ConnectionFailedError(RuntimeError):
     
 class HtmlDocumentParseError(RuntimeError):
     pass
+    
+class UnsupportedInputShapeError(ValueError):
+    pass
+
+
+
+def is_all_numerical_immutable(iterable):
+    """
+    Check if all elements in an iterable are immutable numerical types (int, float, complex).
+
+    Parameters
+    ----------
+        iterable: Iterable[complex | float | int]
+          An iterable of elements to check.
+
+    Returns
+    -------
+        bool:
+          True if all elements are instances of immutable numerical types, False otherwise.
+
+    Raises
+    ------
+        UnsupportedInputShapeError: If the input is not an iterable.
+
+    Examples
+    --------
+    >>> is_all_numerical_immutable([1, 2.5, 3])
+    True
+    >>> is_all_numerical_immutable((1+2j, 3.0))
+    True
+    >>> is_all_numerical_immutable((333.3, 0.0393, 0.1887))
+    True
+    >>> is_all_numerical_immutable([1, "2", 3])
+    False
+    >>> is_all_numerical_immutable(["11", "2", "3"])
+    False
+    >>> is_all_numerical_immutable("123")
+    False
+    >>> is_all_numerical_immutable(123)
+    Traceback (most recent call last):
+    ...
+    UnsupportedInputShapeError: Input must be an iterable.
+
+    """
+    if not isinstance(iterable, Iterable):
+        raise UnsupportedInputShapeError("Input must be an iterable.")
+    
+    immutable_numerics = (int, float, complex)
+    
+    return all(isinstance(item, immutable_numerics) for item in iterable)
 
 
 def tryline(_call: Callable, exception: Exception, *args, **kwargs) -> Any:
