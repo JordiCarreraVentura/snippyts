@@ -9,7 +9,6 @@ test:
 build:
 	source env/snippyts/bin/activate ;
 	python -m build ;
-	version_number=`sh get_version_number.sh` ;
 	python -m twine upload --repository pypi dist/*$(VERSION)*  ;
 
 all: test
