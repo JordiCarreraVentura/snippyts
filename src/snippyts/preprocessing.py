@@ -190,15 +190,3 @@ class KBinsEncoder:
 
 if __name__ == '__main__':
     testmod()
-
-    # print(-1, is_all_numerical_immutable([1, 1, 1, None, 1.0, 1.0, 2.33, 2, 'hello', 'world', 3, 3, 12]))
-    # print(0, is_all_numerical_immutable([1, 2, 3]))
-    # print(1, is_all_numerical_immutable([1, 2.5, 3]))
-    # print(2, is_all_numerical_immutable((1+2j, 3.0)))
-    # print(3, is_all_numerical_immutable((333.3, 0.0393, 0.1887)))
-    # print(4, is_all_numerical_immutable([1, "2", 3]))
-    # print(5, is_all_numerical_immutable(["11", "2", "3"]))
-    # print(6, is_all_numerical_immutable("123"))
-    # print(7, is_all_numerical_immutable(123))
-
-    # kbe = KBinsEncoder()
