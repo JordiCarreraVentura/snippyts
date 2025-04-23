@@ -658,6 +658,37 @@ def gtml(url: str) -> str:
     return tryline(getattr, HtmlDocumentParseError, response, "text")
 
 
+def smart_cast_number(x: float | int) -> float | int:
+    """
+    Cast a numeric value to an integer if it is numerically whole; otherwise, return as float.
+
+    Parameters
+    ----------
+        x: float | int
+          A numeric value to be cast intelligently.
+
+    Returns
+    -------
+        float | int:
+          The input value cast to an integer if it has no fractional part, otherwise returned as a float.
+
+    Examples
+    --------
+    >>> smart_cast_number(1)
+    1
+    >>> smart_cast_number(1.0)
+    1
+    >>> smart_cast_number(1.333)
+    1.333
+    """
+    if (
+        isinstance(x, int)
+        or isinstance(x, float) and int(x) == x
+    ):
+        return int(x)
+    return float(x)
+
+
 
 if __name__ == '__main__':
     testmod()

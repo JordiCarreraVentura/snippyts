@@ -6,8 +6,9 @@ import numpy as np
 from statistics import quantiles
 
 from .__init__ import (
-    is_all_numerical_immutable,
     UnsupportedInputShapeError,
+    is_all_numerical_immutable,
+    smart_cast_number,
     tryline
 )
 
@@ -50,38 +51,32 @@ class KBinsEncoder:
     ... except ValueError:
     ...   assert True
 
-    # >>> kbe = KBinsEncoder(n_bins=3)
-    # >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
-    # >>> kbe.fit(vals)
+    >>> kbe = KBinsEncoder(n_bins=3)
+    >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
+    >>> kbe.fit(vals)
     
-    # >>> kbe.quantiles
-    # array([1. , 2. , 3.5])
+    >>> kbe.quantiles
+    [1.3333, 3, 100.0]
 
-    # >>> kbe.transform([1, 3, 7])
-    # array([1. , 3.5, 3.5])
+    >>> kbe.transform([1, 3, 7])
+    [1.3333, 3, 3]
     
-    # >>> kbe.transform([1, 3, 88])
-    # array([1. , 3.5, 3.5])
+    >>> kbe.transform([1, 3, 88])
+    [1.3333, 3, 100.0]
 
-    # >>> kbe.transform([1000, 100000, 0, 1, 1, 1, 0])
-    # array([3.5, 3.5, 1. , 1. , 1. , 1. , 1. ])
+    >>> kbe.transform([1000, 100000, 0, 1, 1, 1, 0])
+    [100.0, 100.0, 1.3333, 1.3333, 1.3333, 1.3333, 1.3333]
 
-    # >>> kbe.transform([1000, 100000, 0, 1, 2, 2, 0])
-    # array([3.5, 3.5, 1. , 1. , 2. , 2. , 1. ])
+    >>> kbe.transform([1000, 100000, 0, 1, 2, 2, 0])
+    [100.0, 100.0, 1.3333, 1.3333, 1.3333, 1.3333, 1.3333]
     
     """
     
-    def __init__(self, n_bins: int = 10) -> None:
+    def __init__(self, n_bins: int = 10, rounding: int = 4) -> None:
         self.n_bins = n_bins
+        self.rounding = rounding
         self.quantiles: np.array[int | float] = []
-        # self.discretizer = KBinsDiscretizer(
-        #     n_bins=self.n_bins,
-        #     strategy='quantile',
-        #     encode='ordinal'
-        # )
 
-    # def __getitem__(self, key: int) -> int | float:
-    #     return self.quantiles[key]
 
     def fit(self, x: IterableType[Union[float, int]]) -> None:
         """
@@ -117,72 +112,80 @@ class KBinsEncoder:
         self.quantiles = []
         while len(self.quantiles) < self.n_bins:
             bin = np.percentile(x, quantile * (1 + len(self.quantiles)))
-            self.quantiles.append(bin)
-        self.quantiles = np.array(self.quantiles)
-        # self.discretizer.fit(x)
+            self.quantiles.append(round(smart_cast_number(bin), self.rounding))
+        self.quantiles = self.quantiles
 
-    # def transform(
-    #     self, 
-    #     x: IterableType[Union[float, int]]
-    # ) -> IterableType[Union[float, int]]:
-    #     """
-    #     Replaces every input value with the value at the bin-th quantile, ensuring the output vector only has `n_bins` unique elements, but the same dimensionality as the original input vector.
 
-    #     Parameters
-    #     ----------
-    #     x : IterableType[Union[float, int]]
-    #         The data to transform.
+    def transform(
+        self, 
+        x: IterableType[Union[float, int]]
+    ) -> IterableType[Union[float, int]]:
+        """
+        Replaces every input value with the value at the bin-th quantile, ensuring the output vector only has `n_bins` unique elements, but the same dimensionality as the original input vector.
 
-    #     Returns
-    #     -------
-    #     IterableType[Union[float, int]]
-    #         The transformed data.
+        Parameters
+        ----------
+        x : IterableType[Union[float, int]]
+            The data to transform.
+
+        Returns
+        -------
+        IterableType[Union[float, int]]
+            The transformed data.
         
-    #     Example
-    #     -------
-    #     >>> kbe = KBinsEncoder(n_bins=3)
-    #     >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
-    #     >>> kbe.fit(vals)
-    #     >>> kbe.transform([1, 2, 3])
-    #     array([1. , 2. , 3.5])
+        Example
+        -------
+        >>> kbe = KBinsEncoder(n_bins=3)
+        >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
+        >>> kbe.fit(vals)
+        >>> kbe.transform([1, 2, 3])
+        [1.3333, 1.3333, 3]
         
-    #     """
-    #     encoding = self.discretizer.transform(
-    #         np.array(x).reshape(-1, 1)
-    #     )[:, 0]
-    #     return np.array([
-    #         self[bin] for bin in encoding.astype(int)
-    #     ]).reshape(-1, 1)[:, 0]
+        """
+        return type(x)(map(self._get_bin, x))
 
-    # def fit_transform(
-    #     self, 
-    #     x: IterableType[Union[float, int]]
-    # ) -> IterableType[Union[float, int]]:
-    #     """
-    #     Fit the data and then transform it.
 
-    #     Parameters
-    #     ----------
-    #     x : IterableType[Union[float, int]]
-    #         The data to fit and transform.
+    def _get_bin(self, val: Union[float, int]) -> Union[float, int]:
+        arg, argval = None, 10**10
+        for quantile in self.quantiles:
+            distance = abs(val - quantile)
+            if distance < argval:
+                arg = quantile
+                argval = distance
+        return arg
 
-    #     Returns
-    #     -------
-    #     IterableType[Union[float, int]]
-    #         The transformed data.
 
-    #     Example
-    #     -------
-    #     >>> kbe = KBinsEncoder(n_bins=3)
-    #     >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
-    #     >>> transformed = kbe.fit_transform(vals)
-    #     >>> assert not(transformed.sum() - np.array([1. , 1. , 1. , 1. , 
-    #     ...   1. , 1. , 2. , 2. , 2. , 2. , 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,
-    #     ...   3.5]).sum())
+    def fit_transform(
+        self, 
+        x: IterableType[Union[float, int]]
+    ) -> IterableType[Union[float, int]]:
+        """
+        Fit the data and then transform it.
 
-    #     """
-    #     self.fit(x)
-    #     return self.transform(x)
+        Parameters
+        ----------
+        x : IterableType[Union[float, int]]
+            The data to fit and transform.
+
+        Returns
+        -------
+        IterableType[Union[float, int]]
+            The transformed data.
+
+        Example
+        -------
+        >>> kbe = KBinsEncoder(n_bins=3)
+        >>> vals = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 10, 100]
+        >>> transformed = kbe.fit_transform(vals)
+        >>> assert transformed == [
+        ...   1.3333, 1.3333, 1.3333, 1.3333, 1.3333, 1.3333, 
+        ...   1.3333, 1.3333, 1.3333, 1.3333, 
+        ...   3, 3, 3, 3, 3, 3, 100.0
+        ... ]
+
+        """
+        self.fit(x)
+        return self.transform(x)
 
 
 if __name__ == '__main__':
