@@ -104,8 +104,6 @@ class KBinsEncoder:
         if not all_numerical_immutable:
             raise UnsupportedInputShapeError(type(x), x)
         x = np.array(x).reshape(-1, 1)
-        if not x.astype(float).all():
-            raise TypeError(type(x[0]), x[0])
         
         quantile = (1 / self.n_bins) * 100
         
