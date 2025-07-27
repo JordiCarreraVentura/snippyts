@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "snippyts"
-version = "0.2.2"
+version = "0.3.0"
 authors = [
   { name="Jordi Carrera Ventura", email="jordi.carrera.ventura@gmail.com" }
 ]
@@ -20,6 +20,7 @@ dependencies = [
    "flashtext2>=1.1.0",
    "fuzzyset2>=0.2.4",
    "pytest>=8.3.3",
+   "PyYAML==6.0.2",
    "scikit-learn==1.6.1",
    "twine>=5.1.1",
    "Unidecode>=1.3.8"
@@ -28,4 +29,3 @@ dependencies = [
 [project.urls]
 "GitHub repository" = "https://github.com/JordiCarreraVentura/snippyts"
 "pypi page" = "https://pypi.org/project/snippyts"
-

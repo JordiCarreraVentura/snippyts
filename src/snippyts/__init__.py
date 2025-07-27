@@ -1,17 +1,20 @@
 import csv
 import json
 import requests
+import yaml
+import os
+import sys
 from collections.abc import Iterable
-from collections import OrderedDict
+from collections import namedtuple, OrderedDict
+from copy import deepcopy as cp
+from doctest import testmod
+from itertools import chain
 from pickle import (
     dump as pdump,
     load as pload
 )
-from urllib.parse import urlparse
-
-from doctest import testmod
-from itertools import chain
 from typing import Any, Callable, Dict, Iterable, List
+from urllib.parse import urlparse
 
 from .trie import (
     test as test_trie,
@@ -343,7 +346,6 @@ def from_txt(path: str) -> str:
     """
     with open(path, 'r') as rd:
         return rd.read().strip()
-
 
 
 def to_csv(
@@ -688,6 +690,209 @@ def smart_cast_number(x: float | int) -> float | int:
         return int(x)
     return float(x)
 
+
+def to_yaml(
+    data: List[Any],
+    path: str
+) -> None:
+    """
+    Function that expects a list of serializable objects and a string denoting
+    a path, and writes the data to a YAML file at the given path.
+
+    Parameters
+    ----------
+    data: List[Any]
+        A list of YAML-serializable Python objects.
+
+    path: str
+        The location where the input data must be stored, as a POSIX path.
+
+    Returns
+    -------
+    Nothing. Writes the input variable `data` to the disk location denoted by `path`.
+
+    Examples
+    --------
+    >>> test_path = "./test_path.yaml"
+    >>> data = [{"Name": "John", "Age": 30}, {"Name": "Jane", "Age": 25}]
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_yaml(data, test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_yaml(test_path) == data
+    >>> assert data[0]["Name"] == "John"
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'w') as wrt:
+        yaml.dump(data, wrt, default_flow_style=False)
+
+
+def from_yaml(path: str) -> List[Any]:
+    """
+    Function that reads a YAML file from the specified POSIX path and returns the
+    deserialized Python list object.
+
+    Parameters
+    ----------
+    path: str
+        The location where the input data is stored, as a POSIX path.
+
+    Returns
+    -------
+    List[Any]: The content read from the disk location denoted by the `path`.
+
+    Examples
+    --------
+    >>> test_path = "./test_path.yaml"
+    >>> data = [{"Name": "John", "Age": 30}, {"Name": "Jane", "Age": 25}]
+
+    >>> assert not os.path.exists(test_path)
+    >>> to_yaml(data, test_path)
+    >>> assert os.path.exists(test_path)
+    >>> assert os.path.isfile(test_path)
+    >>> assert from_yaml(test_path) == data
+    >>> assert from_yaml(test_path)[1]["Age"] == 25
+
+    >>> os.remove(test_path)
+    """
+    with open(path, 'r') as rd:
+        return yaml.safe_load(rd)
+
+
+def is_number(string: str) -> bool:
+    """
+    Function that checks whether a string can be interpreted as a integer or a float.
+
+    Parameters
+    ----------
+    string: str
+        String to be checked
+
+    Returns
+    -------
+    bool: Whether the string can be interpreted as a integer or a float (True), or neither (False).
+
+    Doctests:
+    >>> is_number('123')
+    True
+    >>> is_number('12.3')
+    True
+    >>> is_number('abc')
+    False
+    >>> is_number('12.3.4')
+    True
+    """
+    if (
+        string.isdigit()
+        or string.replace('.', '').isdigit()
+    ):
+        return True
+    return False
+
+
+def read_arg(name: str) -> Any:
+    """
+    Function that reads command line arguments passed to a python script, then returns
+    the corresponding value of the specified argument's name.
+
+    Parameters
+    ----------
+    name: str
+        The name of the argument whose value is to be returned.
+
+    Returns
+    -------
+    Any: On finding the matching name in the command line arguments, the function 
+    behaves in the following manner:
+    - If parameter is followed by another parameter (a value starting with '-'), 
+      it returns `True` as the argument for the former.
+    - If the parameter is not followed by an argument, it returns `True`.
+    - If the argument can be converted to `float`, returns it so converted.
+    - If the argument can be converted to `int`, returns it so.
+    - In all other cases, returns the value as a string.
+    - If no matches are found for the specified parameter name, returns `False`.
+
+    Examples
+    --------
+    >>> import sys
+    >>> sys.argv.extend(['--param_1', 'arg_1'])
+    >>> sys.argv.extend(['--param_2'])
+    >>> sys.argv.extend(['--param_3', '3'])
+
+    >>> read_arg('param_1')
+    'arg_1'
+    >>> read_arg('param_2')
+    True
+    >>> read_arg('param_3')
+    3
+
+    Missing arguments default to `False`:
+    >>> read_arg('param_4')
+    False
+
+    Hyphens must not matter:
+    >>> read_arg('--param_1')
+    'arg_1'
+    >>> read_arg('--param_2')
+    True
+    >>> read_arg('--param_3')
+    3
+    """
+    args = sys.argv
+    name = name.strip('-')
+    for idx, param in enumerate(args):
+        if not param.strip('-') == name:
+            continue
+        if idx < len(args) - 1:
+            arg = args[idx + 1]
+            if arg.startswith('-'):
+                return True
+        else:
+            return True
+        if not is_number(arg):
+            return arg
+        return float(arg) if '.' in arg else int(arg)
+    else:
+        return False
+
+
+def read_args(tuple_name: str = 'Parameters') -> namedtuple:
+    """
+    Function that reads all named command line arguments passed to a Python script
+    (names are those starting with '-'), then saves their corresponding values into a 
+    namedtuple. The argument names are converted into valid attribute names by 
+    stripping leading hyphens and replacing non-alpha-numeric characters with underscores.
+
+    Returns
+    -------
+    named_params: A namedtuple with attributes being all the named command line 
+        arguments passed to the script
+
+    Examples
+    --------
+    >>> import sys
+    >>> sys.argv.extend(['--param_6', 'arg_1_2'])
+    >>> sys.argv.extend(['--param_7', '--param_8'])
+    >>> sys.argv.extend(['--param_5', '55.3'])
+    
+    >>> params = read_args()
+    >>> params.param_6
+    'arg_1_2'
+    >>> params.param_2
+    True
+    >>> assert params.param_7 == params.param_8
+    >>> params.param_5
+    55.3
+    """
+    param_names = [param.strip('-') for param in sys.argv if param.startswith('-')]
+    args = OrderedDict()
+    for param in param_names:
+        args[param] = read_arg(param)
+    
+    named_params = namedtuple(tuple_name, list(args.keys()))(*args.values())
+    return named_params
 
 
 if __name__ == '__main__':
