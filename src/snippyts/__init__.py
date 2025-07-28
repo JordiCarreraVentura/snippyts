@@ -895,6 +895,44 @@ def read_args(tuple_name: str = 'Parameters') -> namedtuple:
     return named_params
 
 
+def defolder(path: str) -> str:
+    """
+    Function that takes a path string as an argument. If a folder at that path does not 
+    exist yet, it gets created. It then returns the real path of the folder,
+    resolving any symbolic links in the path if they exist.
+
+    Parameters
+    ----------
+    path: str
+        The directory path that should be created and resolved
+
+    Returns
+    -------
+    str
+        The canonical path string of the created/resolved directory
+
+    Examples
+    --------
+    >>> import os
+    >>> folder = 'test_defolder_folder'
+    >>> assert os.path.exists(folder)
+    >>> path = defolder(folder)
+    
+    >>> assert os.path.exists(path)
+    >>> assert os.path.exists(folder)
+    >>> assert os.path.basename(path) == folder
+
+    >>> os.removedirs(folder)
+
+    >>> assert not os.path.exists(path)
+    >>> assert not os.path.exists(folder)
+    """
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+    return os.path.realpath(path)
+
+
+
 if __name__ == '__main__':
     testmod()
     test_trie()
