@@ -5,7 +5,7 @@ from typing import Iterable as IterableType, Union
 import numpy as np
 from statistics import quantiles
 
-from .__init__ import (
+from .utilities import (
     UnsupportedInputShapeError,
     is_all_numerical_immutable,
     smart_cast_number,
@@ -140,7 +140,7 @@ class KBinsEncoder:
         [1.3333, 1.3333, 3]
         
         """
-        return type(x)(map(self._get_bin, x))
+        return type(x)(list(map(self._get_bin, x)))
 
 
     def _get_bin(self, val: Union[float, int]) -> Union[float, int]:
