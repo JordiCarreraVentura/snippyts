@@ -16,8 +16,6 @@ from pickle import (
 from typing import Any, Callable, Dict, Iterable, List
 from urllib.parse import urlparse
 
-
-from .preprocessing import KBinsEncoder
 from .trie import (
     test as test_trie,
     Trie
@@ -781,7 +779,7 @@ def defolder(path: str) -> str:
     --------
     >>> import os
     >>> folder = 'test_defolder_folder'
-    >>> assert os.path.exists(folder)
+    >>> assert not os.path.exists(folder)
     >>> path = defolder(folder)
     
     >>> assert os.path.exists(path)
