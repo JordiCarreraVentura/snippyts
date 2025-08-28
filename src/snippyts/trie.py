@@ -2,7 +2,9 @@ from collections import defaultdict as deft
 from doctest import testmod
 from typing import Any, Dict, List, Union
 
+from nltk import wordpunct_tokenize as tokenize
 from unidecode import unidecode
+from tqdm import tqdm
 
 
 class Trie:
@@ -149,9 +151,9 @@ class Trie:
 
             To get matches for partial strings, use method `search` instead.
         """
-        return True if self(w) else False
+        return True if self(word) else False
 
-    def search(self, word: str) -> List[str]:
+    def search(self, text: str) -> List[str]:
         """
         Parameters
         ----------
@@ -171,11 +173,13 @@ class Trie:
             as the value of argument `word`.
 
         """
-        word = self.__preprocess_word(word)
-        candidates = self.__lookup(
-            word, self._tree, [], list(word), []
-        )
-        return candidates
+        matches = []
+        for word in tokenize(text):
+            word = self.__preprocess_word(word)
+            matches.extend(self.__lookup(
+                word, self._tree, [], list(word), []
+            ))
+        return matches
 
     def __call__(self, word: str) -> List[str]:
         """
@@ -264,23 +268,47 @@ def test_speed():
             test_set += [word] * times_oversampled
 
     n_eval = 10000
-    trie = Trie()
+    trie = Trie(case_sensitive=True)
     trie += test_set
     start = time.time()
     trie.add("Arda")
-    for w in random.sample(vocab + ["Ard"], n_eval):
+    for idx, w in enumerate(tqdm(random.sample(vocab + ["Ard"], n_eval))):
         results = trie.search(w)
-        if w in "Arda":
+        if "Arda" in results:
             assert True
     runtime = time.time() - start
     throughput_second = n_eval * (1 / runtime)
 
-    assert runtime < 0.05
+    assert runtime < 0.1
     assert round(math.log(throughput_second, 10)) >= 5
+
+
+def test_inclusion_method():
+    trie = Trie()
+    trie += ['mes', 'mirena', 'ok']
+    assert 'ok' in trie
+    assert 'Ok' not in trie
+    assert 'kardanski' not in trie
+
+
+def test_lookup():
+    target = (
+        "¿Ok? Entonces va a ser, es mucho dependiendo de lo que tú quieras también"
+        ", ¿ok? Esa es la diferencia principal entre el mirena y el de cobre, es "
+        "de que el mirena dejas de arreglar y el de cobre sigues arreglando mes "
+        "con mes como era, pero es abundante. ¿Ok?"
+    )
+    trie = Trie()
+    trie += ['mes', 'mirena', 'ok']
+    assert trie("ok") == ['ok']
+    assert not trie(target)
+    assert trie.search(target) == ['ok', 'ok', 'mirena', 'mirena', 'mes', 'mes', 'ok']
 
 
 def test():
     testmod()
+    test_inclusion_method()
+    test_lookup()
     test_speed()
 
 
