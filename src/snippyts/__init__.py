@@ -791,10 +791,15 @@ def defolder(path: str) -> str:
     >>> assert not os.path.exists(path)
     >>> assert not os.path.exists(folder)
     """
-    if not os.path.exists(path):
-        os.makedirs(path, exist_ok=True)
-    return os.path.realpath(path)
-
+    dirname = os.path.dirname(path)
+    filename = os.path.basename(path)
+    has_file = False
+    if '.' in filename:
+        has_file = True
+    target = path if not has_file else dirname
+    if not os.path.exists(target):
+        os.makedirs(target, exist_ok=True)
+    return os.path.realpath(os.path.join(target, filename))
 
 
 if __name__ == '__main__':
