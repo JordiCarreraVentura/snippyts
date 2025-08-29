@@ -50,13 +50,13 @@ Miscellaneous utility scripts and Python objects for agile development.
 **I/O Functions**
 3. Adds `snippyts.__init__.to_yaml`, a function for writing out YAML-formatted data.
 5. Adds `snippyts.__init__.from_yaml`, a function that reads in YAML-formatted data into a Python dictionary.
-5. Adds `snippyts.__init__.read_arg `, a function that returns the value of a specified command-line parameter name (names are those starting with `-` or `--`).
-6. Adds `snippyts.__init__.read_args `, like `read_arg` but for applies implicitly to all parameters and returns their arguments as values in a `namedtuple`, with the parameter name as the attributes.
+5. Adds `snippyts.__init__.read_arg`, a function that returns the value of a specified command-line parameter name (names are those starting with `-` or `--`).
+6. Adds `snippyts.__init__.read_args`, like `read_arg` but for applies implicitly to all parameters and returns their arguments as values in a `namedtuple`, with the parameter name as the attributes.
 
 **System & Language**
 2. Adds `snippyts.__init__.cp`, a shorthand for `copy.deepcopy`.
 1. Adds `snippyts.__init__.smart_cast_number`, a function for casting a numeric value to an integer if it is numerically whole; otherwise, return as float.
-1. Adds `snippyts.__init__. is_number `, a function that checks whether a string can be interpreted as a integer or a float.3. Adds `snippyts.__init__.defolder`, a function that handles path strings and creates folders if they do not exist yet.4. Adds `snippyts.__init__.UnsupportedInputShapeError`, an exception for handling unsupported input shapes.
+1. Adds `snippyts.__init__.is_number`, a function that checks whether a string can be interpreted as a integer or a float.3. Adds `snippyts.__init__.defolder`, a function that handles path strings and creates folders if they do not exist yet.4. Adds `snippyts.__init__.UnsupportedInputShapeError`, an exception for handling unsupported input shapes.
 
 
 # Running tests
