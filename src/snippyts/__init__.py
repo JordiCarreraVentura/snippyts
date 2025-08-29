@@ -778,13 +778,13 @@ def defolder(path: str) -> str:
     Examples
     --------
     >>> import os
-    >>> folder = 'test_defolder_folder'
+    >>> folder = os.path.join(os.getcwd(), 'test_defolder_folder')
     >>> assert not os.path.exists(folder)
     >>> path = defolder(folder)
     
     >>> assert os.path.exists(path)
     >>> assert os.path.exists(folder)
-    >>> assert os.path.basename(path) == folder
+    >>> assert os.path.basename(path) == os.path.basename(folder)
 
     >>> os.removedirs(folder)
 
@@ -799,7 +799,11 @@ def defolder(path: str) -> str:
     target = path if not has_file else dirname
     if not os.path.exists(target):
         os.makedirs(target, exist_ok=True)
-    return os.path.realpath(os.path.join(target, filename))
+    if has_file:
+        return os.path.realpath(os.path.join(target, filename))
+    else:
+        return os.path.realpath(target)
+
 
 
 if __name__ == '__main__':
