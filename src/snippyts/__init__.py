@@ -1,6 +1,5 @@
 import csv
 import json
-import requests
 import yaml
 import os
 import sys
@@ -504,55 +503,6 @@ def from_pickle(path: str):
     with open(path, "rb") as rd:
         data = pload(rd)
     return data
-
-
-def gtml(url: str) -> str:
-    """
-    Gets the HTML content of the document at the specified location URL. Named `gtml` as a shorthand for "get HTML".
-    
-    Parameters
-    ----------
-    url: str
-       URL pointing to an HTML document.
-    
-    Returns
-    -------
-    str
-       The text of the HTML document.
-    
-    Raises
-    ------
-    NotaUrlError
-       The input is not a URL.
-
-    ConnectionFailedError
-        The input URL is correct but it could not be fetched.
-       
-    HtmlDocumentParseError
-        The input URL is correct and it was correctly fetched, but no text
-        could be parsed.
-    
-    Examples
-    -------
-    
-    # Provided input cannot be parsed as a URL:
-    >>> try:
-    ...   gtml("hts://stackoverflow.com/questions/4075190/"
-    ...        "what-is-how-to-use-getattr-in-python")
-    ... except NotAUrlError:
-    ...   assert True
-    
-    # Working as intended:
-    >>> html = gtml("https://example.com")
-    >>> assert len(html) == 1256
-    >>> html = ''.join(html.splitlines()).replace('"', "'") 
-    >>> assert html == "<!doctype html><html><head>    <title>Example Domain</title>    <meta charset='utf-8' />    <meta http-equiv='Content-type' content='text/html; charset=utf-8' />    <meta name='viewport' content='width=device-width, initial-scale=1' />    <style type='text/css'>    body {        background-color: #f0f0f2;        margin: 0;        padding: 0;        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;            }    div {        width: 600px;        margin: 5em auto;        padding: 2em;        background-color: #fdfdff;        border-radius: 0.5em;        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);    }    a:link, a:visited {        color: #38488f;        text-decoration: none;    }    @media (max-width: 700px) {        div {            margin: 0 auto;            width: auto;        }    }    </style>    </head><body><div>    <h1>Example Domain</h1>    <p>This domain is for use in illustrative examples in documents. You may use this    domain in literature without prior coordination or asking for permission.</p>    <p><a href='https://www.iana.org/domains/example'>More information...</a></p></div></body></html>"
-    """
-    tryline(is_url, NotAUrlError, url)
-    response = tryline(requests.get, ConnectionFailedError, url)
-    response = requests.get(url)
-    response.raise_for_status()
-    return tryline(getattr, HtmlDocumentParseError, response, "text")
 
 
 def to_yaml(

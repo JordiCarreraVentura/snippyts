@@ -27,7 +27,6 @@ Miscellaneous utility scripts and Python objects for agile development.
 | 14 | `snippyts.`<br>`__init__.`<br>`from_csv` | Function that can be directed to a local CSV file by its POSIX path and returns the content of that file as a list of lists (or, more geneally, an Iterable contaning other Iterables which is expected to represent a CSV-structured matrix). | 2024 Oct 26 | 2024 Oct 26 |
 | 15 | `snippyts.`<br>`__init__.`<br>`tryline` | Wraps a try-raise block into a single statement. It is intended to flatten try-catch.<br><br>It attempts to call the specified Python-callable object with the provided arguments and keyword arguments.<br><br>If the call is successful, it silently returns the output of the call.<br><br>If it fails, it raises an exception of the type provided as the second argument.| 2025 Feb 28 | 2025 Feb 28 |
 | 16 | `snippyts.`<br>`__init__.`<br>`is_url` | Determines whether a given string is a valid URL.<br><br>It uses urllib.parse.urlparse, a function that splits a URL into six components: scheme, network location, path, parameters, query, and fragment.  | 2025 Feb 28 | 2025 Feb 28 |
-| 17 | `snippyts.`<br>`__init__.`<br>`gtml` | Gets the HTML content of the document at the specified location URL. Named `gtml` as a shorthand for "get HTML". | 2025 Feb 28 | 2025 Feb 28 |
 | 18 | `snippyts.`<br>`preprocessing.`<br>`KBinsEncoder` | Discretizes the data into `n_bins` using scikit-learn's `KBinsDiscretizer` class, and then replaces every input value with the value at the bin-th quantile, ensuring that the output vector<br>- only has `n_bins` unique element but<br>- has the same dimensionality as the original input vector. | 2025 Feb 28 | **2025 Aug 23** |
 | 19 | `snippyts.`<br>`__init__.`<br>`to_yaml` | Works like `to_txt` but writes out YAML-formatted data. | **2025 Jul 27** | **2025 Jul 27** |
 | 20 | `snippyts.`<br>`__init__.`<br>`cp` | Shorthand for `copy.deepcopy`. | **2025 Jul 27** | **2025 Jul 27** |
@@ -40,23 +39,44 @@ Miscellaneous utility scripts and Python objects for agile development.
 | 27 | `snippyts.`<br>`__init__.`<br>`read_arg` | Function that reads command line arguments passed to a python script, then returns the corresponding value of the specified argument's name. | **2025 JUL 27** | **2025 JUL 27** |
 | 28 | `snippyts.`<br>`__init__.`<br>`read_args` | Function that reads all named command line arguments passed to a Python script (names are those starting with `-` or `--`), then saves their corresponding values into a namedtuple. <br><br>The argument names are converted into valid attribute names by stripping leading hyphens and replacing non-alpha-numeric characters with underscores. | **2025 JUL 27** | **2025 JUL 27** |
 
+### Deprecated
+
+| No. | Name | Description | Date added | Date removed |
+| --- | --- | --- | --- | --- |
+| 17 | `snippyts.`<br>`__init__.`<br>`gtml` | Removed due to authentication issues. Nowadays, most websites seem to be rejecting connections with the kind of parameterization used in this function. <del>Gets the HTML content of the document at the specified location URL. Named `gtml` as a shorthand for "get HTML"</del>. | <del>2025 Feb 28</del> | 2025 Nov 22 |
+
+
 ## Change log
+
+### 2025 NOV
+
+**Networking**
+
+1. Removed `gtml` function for scraping as most sites tend to block it and ends up not working unless more advanced authentication is implemented.
+
 
 ### 2025 AUG
 
 **NLP & ML**
 
-1. Fixes `snippyts.trie.Trie`.2. Fixes `snippyts.preprocessing.KBinsEncoder`.3. Adds `snippyts.metrics.average_token_similarity`, a function for calculating the average token similarity between two strings.
-**I/O Functions**
-3. Adds `snippyts.__init__.to_yaml`, a function for writing out YAML-formatted data.
+1. Fixes `snippyts.trie.Trie`.
+2. Fixes `snippyts.preprocessing.KBinsEncoder`.
+3. Adds `snippyts.metrics.average_token_similarity`, a function for calculating the average token similarity between two strings.
+
+**I/O Functions**
+
+3. Adds `snippyts.__init__.to_yaml`, a function for writing out YAML-formatted data.
 5. Adds `snippyts.__init__.from_yaml`, a function that reads in YAML-formatted data into a Python dictionary.
 5. Adds `snippyts.__init__.read_arg`, a function that returns the value of a specified command-line parameter name (names are those starting with `-` or `--`).
 6. Adds `snippyts.__init__.read_args`, like `read_arg` but for applies implicitly to all parameters and returns their arguments as values in a `namedtuple`, with the parameter name as the attributes.
 
 **System & Language**
-2. Adds `snippyts.__init__.cp`, a shorthand for `copy.deepcopy`.
+
+2. Adds `snippyts.__init__.cp`, a shorthand for `copy.deepcopy`.
 1. Adds `snippyts.__init__.smart_cast_number`, a function for casting a numeric value to an integer if it is numerically whole; otherwise, return as float.
-1. Adds `snippyts.__init__.is_number`, a function that checks whether a string can be interpreted as a integer or a float.3. Adds `snippyts.__init__.defolder`, a function that handles path strings and creates folders if they do not exist yet.4. Adds `snippyts.__init__.UnsupportedInputShapeError`, an exception for handling unsupported input shapes.
+1. Adds `snippyts.__init__.is_number`, a function that checks whether a string can be interpreted as a integer or a float.
+3. Adds `snippyts.__init__.defolder`, a function that handles path strings and creates folders if they do not exist yet.
+4. Adds `snippyts.__init__.UnsupportedInputShapeError`, an exception for handling unsupported input shapes.
 
 
 # Running tests
