@@ -1,14 +1,18 @@
 VERSION := $(shell awk '/version/ {print substr($$3, 2, length($$3) - 2)}' pyproject.toml)
+PYINT := env/snippyts/bin/python
 
-test:
-	source env/snippyts/bin/activate ;
-	pytest tests ;
-	python -m src.snippyts.__init__ ;
-	python -m src.snippyts.preprocessing ;
+clean:
+	rm -f cachion*json cachion*.p
+
+test: clean
+	$(PYINT) -m pytest tests/* ;
+	$(PYINT) -m src.snippyts.__init__ ;
+	$(PYINT) -m src.snippyts.preprocessing ;
 
 build:
-	source env/snippyts/bin/activate ;
-	python -m build ;
-	python -m twine upload --repository pypi dist/*$(VERSION)*  ;
+	$(PYINT) -m build
 
-all: test
+push:
+	$(PYINT) -m twine upload --repository pypi dist/*$(VERSION)*  ;
+
+release: build push
