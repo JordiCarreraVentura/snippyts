@@ -1,7 +1,7 @@
 import atexit
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable, List
 
 from src.snippyts import (
     tryline,
@@ -39,6 +39,19 @@ class Cachionary:
         self.payload = dict([])
         self.reload()
         atexit.register(self.persist)
+    
+    def __len__(self) -> int:
+        return len(self.payload) + len(self.new_keys)
+    
+    def __iter__(self) -> Iterable[Any]:
+        for key in self.payload.keys():
+            yield key
+    
+    def keys(self) -> List[Any]:
+        return [key for key in self]
+
+    def values(self) -> List[Any]:
+        return [self[key] for key in self]
     
     def reload(self) -> None:
         if not os.path.exists(self.path):
