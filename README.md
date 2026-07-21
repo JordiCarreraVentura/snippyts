@@ -38,6 +38,7 @@ Miscellaneous utility scripts and Python objects for agile development.
 | 26 | `snippyts.`<br>`__init__.`<br>`is_number` | Function that checks whether a string can be interpreted as a integer or a float. | **2025 AUG 1** | **2025 AUG 1** |
 | 27 | `snippyts.`<br>`__init__.`<br>`read_arg` | Function that reads command line arguments passed to a python script, then returns the corresponding value of the specified argument's name. | **2025 JUL 27** | **2025 JUL 27** |
 | 28 | `snippyts.`<br>`__init__.`<br>`read_args` | Function that reads all named command line arguments passed to a Python script (names are those starting with `-` or `--`), then saves their corresponding values into a namedtuple. <br><br>The argument names are converted into valid attribute names by stripping leading hyphens and replacing non-alpha-numeric characters with underscores. | **2025 JUL 27** | **2025 JUL 27** |
+| 29 | `snippyts.`<br>`cachionary.`<br>`Cachionary` | A class implementing a caching dictionary that persists data to disk in JSON or pickle format. On initialization, it loads existing data from the given file path; on program exit (via `atexit`), it serializes the dictionary back to disk. Supports standard dictionary operations (`in`, `[]` access, assignment). | **2026 Apr 09** | **2026 Apr 09** |
 
 ### Deprecated
 
@@ -47,6 +48,13 @@ Miscellaneous utility scripts and Python objects for agile development.
 
 
 ## Change log
+
+### 2026 APR
+
+**Caching & Persistence**
+
+1. Adds `snippyts.cachionary.Cachionary`, a class implementing a caching dictionary with automatic disk persistence (JSON or pickle format) and `atexit`-based serialization.
+
 
 ### 2025 NOV
 
