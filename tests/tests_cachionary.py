@@ -26,7 +26,26 @@ def test_param_format_false():
         assert True
     clear()
 
+def test_cachionary():
+    path_test_cachionary = "cachionary_test.json"
+    if os.path.exists(path_test_cachionary):
+        os.remove(path_test_cachionary)
+    assert not os.path.exists(path_test_cachionary)
+    cachionary = Cachionary(path_test_cachionary)
+    assert len(cachionary) == 0
+    cachionary[1] = 1
+    cachionary[2] = 2
+    assert len(cachionary) == 2
+    del cachionary
+    assert os.path.exists(path_test_cachionary)
+    cachionary = Cachionary(path_test_cachionary)
+    assert len(cachionary) == 2
+    del cachionary
+    os.remove(path_test_cachionary)
+
+
 
 if __name__ == "__main__":
     test_param_format_true()
     test_param_format_false()
+    test_cachionary()

@@ -3,6 +3,7 @@ PYINT := env/snippyts/bin/python
 
 test:
 	$(PYINT) -m pytest tests ;
+	$(PYINT) -m pytest tests/* ;
 	$(PYINT) -m src.snippyts.__init__ ;
 	$(PYINT) -m src.snippyts.preprocessing ;
 
