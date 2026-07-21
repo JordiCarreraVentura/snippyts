@@ -755,8 +755,9 @@ def defolder(path: str) -> str:
         return os.path.realpath(target)
 
 
+from .cachionary import Cachionary
+
 
 if __name__ == '__main__':
     testmod()
     test_trie()
-

@@ -4,7 +4,7 @@ import weakref
 from pathlib import Path
 from typing import Any, Iterable, List
 
-from src.snippyts import (
+from . import (
     tryline,
     from_json,
     from_pickle,
@@ -88,7 +88,10 @@ class Cachionary:
             raise KeyError(key)
     
     def get(self, key: object, default: Any = None) -> Any:
-        return self.get(key, default)
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def __setitem__(self, key: object, val: object) -> None:
         self.payload[key] = val

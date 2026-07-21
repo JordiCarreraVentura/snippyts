@@ -7,6 +7,7 @@ share/*
 
 # Python package
 dist/snippyts*
+build/*
 src/snippyts.egg-info/*
 
 # Python cache
@@ -18,3 +19,4 @@ tests/__pycache__/*
 
 # Documentation (local)
 doc/DEV.txt
+

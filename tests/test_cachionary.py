@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from snippyts import Cachionary
-from snippyts.cachionary import Cachionary as CachionaryFromModule
+from src.snippyts import Cachionary
+from src.snippyts.cachionary import Cachionary as CachionaryFromModule
 
 PATH_TESTS_MODULE = Path(os.path.realpath(__file__))
 PATH_REPO = PATH_TESTS_MODULE.parent.parent
