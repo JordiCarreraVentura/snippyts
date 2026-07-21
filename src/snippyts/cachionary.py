@@ -1,4 +1,3 @@
-import atexit
 import os
 from pathlib import Path
 from typing import Any, Iterable, List
@@ -71,6 +70,10 @@ class Cachionary:
             raise ExcludedMiddleViolation(
                 f"got {self.format} but expected {str(SUPPORTED_FORMATS)}"
             )
+
+    def __del__(self) -> None:
+        if hasattr(self, "format") and (self.payload or self.path.exists()):
+            self.persist()
 
     def __contains__(self, key: object) -> bool:
         return key in self.payload

@@ -13,6 +13,7 @@ def clear():
         os.remove(PATH_CACHIONARY_JSON)
 
 def test_param_format_true():
+    clear()
     cnary = Cachionary(PATH_CACHIONARY_JSON)
     cnary = Cachionary(PATH_CACHIONARY_JSON, format="json")
     cnary = Cachionary(PATH_CACHIONARY_JSON, format="pickle")
