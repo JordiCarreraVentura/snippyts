@@ -1,4 +1,6 @@
+import atexit
 import os
+import weakref
 from pathlib import Path
 from typing import Any, Iterable, List
 
@@ -33,11 +35,12 @@ class Cachionary:
         )
         self.format = format
         self.new_keys = set([])
-        self.path = Path(path).expanduser().resolve()
+        self.path = Path(path).expanduser().resolve() if isinstance(path, str) else path
         self.path.parent.mkdir(exist_ok=True, parents=True)
         self.payload = dict([])
         self.reload()
-        atexit.register(self.persist)
+        ref = weakref.ref(self)
+        atexit.register(lambda: ref() and ref().persist())
     
     def __len__(self) -> int:
         return len(self.payload) + len(self.new_keys)

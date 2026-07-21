@@ -14,9 +14,9 @@ def clear():
 
 def test_param_format_true():
     clear()
-    cnary = Cachionary(PATH_CACHIONARY_JSON)
-    cnary = Cachionary(PATH_CACHIONARY_JSON, format="json")
-    cnary = Cachionary(PATH_CACHIONARY_JSON, format="pickle")
+    _ = Cachionary(PATH_CACHIONARY_JSON)
+    _ = Cachionary(PATH_CACHIONARY_JSON, format="json")
+    _ = Cachionary(PATH_CACHIONARY_JSON, format="pickle")
     clear()
     assert True
 
@@ -39,14 +39,14 @@ def test_cachionary():
     assert len(cachionary) == 2
     del cachionary
     assert os.path.exists(path_test_cachionary)
-    cachionary = Cachionary(path_test_cachionary)
-    assert len(cachionary) == 2
-    del cachionary
+    _cachionary = Cachionary(path_test_cachionary)
+    assert len(_cachionary) == 2
+    del _cachionary
     os.remove(path_test_cachionary)
 
 
 
 if __name__ == "__main__":
+    test_cachionary()
     test_param_format_true()
     test_param_format_false()
-    test_cachionary()
